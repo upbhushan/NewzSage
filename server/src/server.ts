@@ -3,7 +3,11 @@ dotenv.config();
 
 import express, { Request, Response } from "express";
 import cors from "cors";
-import mainRouter from "./routes/index";
+import user from "./routes/userRoute";
+import publisher from "./routes/publisherRoute";
+import news from "./routes/newsRoute";
+import comment from "./routes/commentRoute";
+import vote from "./routes/voteRoute";
 
 const app = express();
 
@@ -13,14 +17,15 @@ app.use(cors());
 
 
 // Routes
-app.use("/api/v1", mainRouter);
+app.use("/api/v1/user", user);
+app.use("/api/v1/publisher", publisher);
+app.use("/api/v1/news", news);
+app.use("/api/v1/comment", comment);
+app.use("/api/v1/vote", vote);
 
 // Start the server
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
 
-// Example route
-app.get("/", (req: Request, res: Response) => {
-  res.json("Hello World");
-});
+
