@@ -5,8 +5,8 @@ import { z } from 'zod';
 const prisma = new PrismaClient();
 
 const createVoteSchema = z.object({
-  news_id: z.string().uuid("Invalid news ID format"),
-  user_id: z.string().uuid("Invalid user ID format"),
+  news_id: z.string({ invalid_type_error: "Invalid user ID format" }),
+  user_id: z.string({ invalid_type_error: "Invalid user ID format" }),
   vote_type: z.enum(['upvote', 'downvote']),
 });
 

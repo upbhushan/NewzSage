@@ -4,24 +4,25 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET: string = "asjfblansfjklasj";
 
 interface AuthenticatedRequest extends Request {
-  userId?: string;
+  user_id?: string;
 }
 
-export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void => {
+export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     console.log(authHeader);
-    return res.status(406).json({});
+    res.status(406).json({ error: 'Access denied. No token provided.' });
+    return;
   }
 
   const token = authHeader.split(" ")[1];
-
+  
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    req.userId = decoded.userId;
+    const decoded = jwt.verify(token, JWT_SECRET) as { user_id: string };
+    req.user_id = decoded.user_id;
     next();
   } catch (err) {
-    return res.status(407).json({});
+    res.status(407).json({ error: 'Invalid token.' });
   }
 };

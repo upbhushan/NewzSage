@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id            Int             @id @default(autoincrement())
+  username           String          @unique
+  email              String          @unique
+  password_hash      String
+  credibility_score  Float           @default(0)
+  status             String          @default("active")
+  email_verified     Boolean         @default(false)
+  created_at         DateTime        @default(now())
+  updated_at         DateTime        @updatedAt
+  last_login         DateTime?
+  Comments           Comment[]
+  Votes              Vote[]
+  
+  Publisher          Publisher?
+
+  @@map("users")
+
+}
+
+model Publisher {
+  publisher_id   Int    @id @default(autoincrement())
+  user_id        Int    @unique // Ensure one-to-one relation
+  government_id  String?
+  journalism_id  String
+  User           User   @relation(fields: [user_id], references: [user_id])
+  News           News[]
+  Credibility    UserCredibility?
+  @@map("publishers")
+}
+
+model News {
+  news_id          Int       @id @default(autoincrement())
+  title            String
+  content          String
+  image_url        String
+  fake_probability Float?
+  real_probability Float?
+  created_at       DateTime  @default(now())
+  publisher_id     Int
+  Publisher        Publisher @relation(fields: [publisher_id], references: [publisher_id])
+  Comments         Comment[]
+  Votes            Vote[]
+  upvote_count     Int       @default(0)
+  downvote_count   Int       @default(0)
+
+  @@map("news")
+}
+
+
+model Comment {
+  comment_id  Int       @id @default(autoincrement())
+  news_id     Int
+  user_id     Int
+  content     String
+  created_at  DateTime  @default(now())
+  News        News      @relation(fields: [news_id], references: [news_id])
+  User        User      @relation(fields: [user_id], references: [user_id])
+
+  @@map("comments")
+}
+
+model Vote {
+  vote_id     Int       @id @default(autoincrement())
+  news_id     Int
+  user_id     Int
+  vote_type   String    // Could be 'upvote' or 'downvote'
+  created_at  DateTime  @default(now())
+  News        News      @relation(fields: [news_id], references: [news_id])
+  User        User      @relation(fields: [user_id], references: [user_id])
+
+  @@map("votes")
+}
+
+model UserCredibility {
+  credibility_id   Int       @id @default(autoincrement())
+  change_amount    Float
+  reason           String
+  created_at       DateTime  @default(now())
+  publisher_id          Int @unique
+  Publisher             Publisher      @relation(fields: [publisher_id], references: [publisher_id])
+
+  @@map("user_credibility")
+}
