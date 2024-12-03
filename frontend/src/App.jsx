@@ -1,22 +1,11 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ThumbsUp, ThumbsDown, Edit, Eye, BarChart2 } from 'lucide-react'
-
-// Types
-interface NewsItem {
-  id: number
-  title: string
-  excerpt: string
-  author: string
-  date: string
-  votes: number
-  probability: number
-}
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ThumbsUp, ThumbsDown, Edit, Eye, BarChart2 } from 'lucide-react';
 
 // Dummy data
-const dummyNews: NewsItem[] = [
+const dummyNews = [
   {
     id: 1,
     title: 'Local Festival Draws Record Crowd',
@@ -24,7 +13,7 @@ const dummyNews: NewsItem[] = [
     author: 'Jane Doe',
     date: 'May 15, 1923',
     votes: 120,
-    probability: 0.95
+    probability: 0.95,
   },
   {
     id: 2,
@@ -33,7 +22,7 @@ const dummyNews: NewsItem[] = [
     author: 'John Smith',
     date: 'May 14, 1923',
     votes: 85,
-    probability: 0.88
+    probability: 0.88,
   },
   {
     id: 3,
@@ -42,20 +31,20 @@ const dummyNews: NewsItem[] = [
     author: 'Alice Johnson',
     date: 'May 13, 1923',
     votes: 62,
-    probability: 0.92
+    probability: 0.92,
   },
-]
+];
 
 export default function NewspaperLanding() {
-  const [news, setNews] = useState<NewsItem[]>(dummyNews)
+  const [news, setNews] = useState(dummyNews);
 
-  const handleVote = (id: number, isUpvote: boolean) => {
-    setNews(prevNews =>
-      prevNews.map(item =>
+  const handleVote = (id, isUpvote) => {
+    setNews((prevNews) =>
+      prevNews.map((item) =>
         item.id === id ? { ...item, votes: item.votes + (isUpvote ? 1 : -1) } : item
       )
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 font-serif">
@@ -67,14 +56,14 @@ export default function NewspaperLanding() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
 
 function Header() {
   return (
     <header className="bg-white border-b-4 border-black">
       <div className="container mx-auto px-4 py-6">
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -82,7 +71,7 @@ function Header() {
         >
           NewzSage
         </motion.h1>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -101,12 +90,12 @@ function Header() {
         </ul>
       </nav>
     </header>
-  )
+  );
 }
 
 function Hero() {
   return (
-    <motion.section 
+    <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -122,25 +111,25 @@ function Hero() {
         Start Reading
       </motion.button>
     </motion.section>
-  )
+  );
 }
 
-function NewsSection({ news, onVote }: { news: NewsItem[], onVote: (id: number, isUpvote: boolean) => void }) {
+function NewsSection({ news, onVote }) {
   return (
     <section className="my-12">
       <h2 className="text-3xl font-bold mb-6 text-center">Latest Headlines</h2>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {news.map(item => (
+        {news.map((item) => (
           <NewsCard key={item.id} news={item} onVote={onVote} />
         ))}
       </div>
     </section>
-  )
+  );
 }
 
-function NewsCard({ news, onVote }: { news: NewsItem, onVote: (id: number, isUpvote: boolean) => void }) {
+function NewsCard({ news, onVote }) {
   return (
-    <motion.article 
+    <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -177,7 +166,7 @@ function NewsCard({ news, onVote }: { news: NewsItem, onVote: (id: number, isUpv
         </div>
       </div>
     </motion.article>
-  )
+  );
 }
 
 function FeaturesSection() {
@@ -202,10 +191,10 @@ function FeaturesSection() {
         />
       </div>
     </section>
-  )
+  );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({ icon, title, description }) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -215,7 +204,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
       <h3 className="text-xl font-bold mb-2 text-center">{title}</h3>
       <p className="text-center">{description}</p>
     </motion.div>
-  )
+  );
 }
 
 function Footer() {
@@ -233,23 +222,15 @@ function Footer() {
               <li><a href="#" className="hover:underline">About Us</a></li>
               <li><a href="#" className="hover:underline">FAQs</a></li>
               <li><a href="#" className="hover:underline">Privacy Policy</a></li>
-              <li><a href="#" className="hover:underline">Terms of Service</a></li>
+              <li><a href="#" className="hover:underline">Contact</a></li>
             </ul>
           </div>
           <div className="w-full md:w-1/3">
-            <h4 className="text-lg font-bold mb-4">Connect With Us</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="hover:underline">Twitter</a></li>
-              <li><a href="#" className="hover:underline">Facebook</a></li>
-              <li><a href="#" className="hover:underline">Instagram</a></li>
-              <li><a href="#" className="hover:underline">LinkedIn</a></li>
-            </ul>
+            <h4 className="text-lg font-bold mb-4">Follow Us</h4>
+            <p>Stay connected with our community.</p>
           </div>
-        </div>
-        <div className="mt-8 text-center">
-          <p>&copy; 2023 NewzSage. All rights reserved.</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

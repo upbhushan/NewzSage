@@ -42,8 +42,10 @@ model News {
   news_id          Int       @id @default(autoincrement())
   title            String
   content          String
-  image_url        String
-  fake_probability Float?
+  Genre            Genre[]
+  ImageUrls        ImageUrl[]
+  VideoUrls        VideoUrl[]
+  // string[]
   real_probability Float?
   created_at       DateTime  @default(now())
   publisher_id     Int
@@ -56,6 +58,32 @@ model News {
   @@map("news")
 }
 
+model Genre{
+  genre_id Int @id @default(autoincrement())
+  genre_name String
+  news_id Int
+  News News @relation(fields: [news_id], references: [news_id])
+
+  @@map("genres")
+}
+
+model ImageUrl {
+  image_url_id Int    @id @default(autoincrement())
+  url          String
+  news_id      Int
+  News         News   @relation(fields: [news_id], references: [news_id])
+
+  @@map("image_urls")
+}
+
+model VideoUrl {
+  video_url_id Int    @id @default(autoincrement())
+  url          String
+  news_id      Int
+  News         News   @relation(fields: [news_id], references: [news_id])
+
+  @@map("video_urls")
+}
 
 model Comment {
   comment_id  Int       @id @default(autoincrement())

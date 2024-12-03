@@ -2,9 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
- "scripts": {
-    "start": "node d:/projects/newzSage/server/src/server.ts",
-    "dev": "nodemon d:/projects/newzSage/server/src/server.ts"
+  "type": "commonjs",
+  "scripts": {
+    "start": "node d:/projects/newzSage/server/dist/server.js",
+    "dev": "nodemon d:/projects/newzSage/server/dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +31,6 @@
     "typescript": "^5.6.2"
   },
   "description": "",
-
   "prisma": {
     "schema": "src/prisma/schema.prisma"
   }
