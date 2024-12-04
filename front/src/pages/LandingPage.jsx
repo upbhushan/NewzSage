@@ -2,18 +2,23 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Edit, BarChart2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import sampleNews from '../test/SampleNews';
+import NewsCard from '../components/NewsCard';
 
-function LandingPage() {
+function LandingPage({ isAuthenticated }) {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <Hero />
-      <FeaturesSection />
+    <main className=" py-2">
+        <div className='container mx-auto'>
+            <Hero isAuthenticated={isAuthenticated} />
+            <SampleNewsSection news={sampleNews} /> {/* Use imported sampleNews */}
+            <FeaturesSection />
+        </div>
       <Footer />
     </main>
   );
 }
 
-function Hero() {
+function Hero({ isAuthenticated }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -23,13 +28,32 @@ function Hero() {
     >
       <h2 className="text-4xl font-bold mb-4">Extra! Extra! Read All About It!</h2>
       <p className="text-xl mb-6">Discover the pulse of our community through authentic local stories.</p>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="bg-black text-white font-bold py-2 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-300"
-      >
-        <Link to="/home">Start Reading</Link>
-      </motion.button>
+      {isAuthenticated ? (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-black text-white font-bold py-2 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-300"
+        >
+          <Link to="/home">Start Reading</Link>
+        </motion.button>
+      ) : (
+        <div className="space-x-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-black text-white font-bold py-2 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-300"
+          >
+            <Link to="/signup">Sign Up</Link>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white text-black font-bold py-2 px-6 border-2 border-black hover:bg-black hover:text-white transition-colors duration-300"
+          >
+            <Link to="/signin">Sign In</Link>
+          </motion.button>
+        </div>
+      )}
     </motion.section>
   );
 }
@@ -58,6 +82,19 @@ function FeaturesSection() {
     </section>
   );
 }
+
+function SampleNewsSection({ news }) { // New Section for Sample News
+    return (
+      <section className="my-12">
+        <h2 className="text-3xl font-bold mb-6 text-center">Sample News</h2>
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {news.map((item) => (
+            <NewsCard key={item.id} news={item} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
 function FeatureCard({ icon, title, description }) {
   return (
@@ -99,6 +136,5 @@ function Footer() {
     </footer>
   );
 }
-
 export default LandingPage;
 
