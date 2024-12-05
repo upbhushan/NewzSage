@@ -3,17 +3,43 @@ import { z } from 'zod';
 import News from '../models/News';
 import mongoose from 'mongoose';
 import { getClaimScore } from '../api/apicall';
-// Updated schema with default values for optional fields
+
+interface AuthRequest extends Request {
+  user?: {
+    username: string;
+    user_id: string;
+    isPublisher: boolean;
+    avatar_id?: string;
+  };
+}
+
 const createNewsSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   genres: z.array(z.string()).optional().default([]),
   imageUrls: z.array(z.string()).optional().default([]),
   videoUrls: z.array(z.string()).optional().default([]),
+  author: z.string(),
+  avatar_id: z.string(),
+  created_at: z.date(),
 });
 
-export const createNews = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const validation = createNewsSchema.safeParse(req.body);
+export const createNews = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  console.log("Request user:", req.user);
+
+  if (!req.user || !req.user.username) {
+    res.status(401).json({ error: "Authentication required" });
+    return;
+  }
+
+  const validation = createNewsSchema.safeParse({
+    ...req.body,
+    author: req.user.username, // Automatically set author
+    avatar_id: req.user.avatar_id, // Automatically set avatar_id (adjust logic if different field is used)
+    created_at: new Date(), // Automatically set created_at
+  });
+
+  console.log("Validation result:", validation); // Debug log
 
   if (!validation.success) {
     res.status(400).json({
@@ -25,11 +51,9 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
     return;
   }
 
-  const { title, content, genres, imageUrls, videoUrls } = validation.data;
-  // const publisher_id = req.body.publisher_id; // Use publisher_id from middleware
+  const { title, content, genres, imageUrls, videoUrls, author, avatar_id ,created_at } = validation.data;
 
   try {
-    // Check for duplicate news
     const existingNews = await News.findOne({ title, content }).exec();
 
     if (existingNews) {
@@ -38,7 +62,7 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
       });
       return;
     }
-    // get claim score from API
+
     const claimScoreData = await getClaimScore(content);
     let real_probability = 0;
     if (
@@ -51,17 +75,19 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
     } else {
       console.warn("Unexpected claim score API response format:", claimScoreData);
     }
+
     console.log("Claim score:", real_probability);
 
-    // Create and save the new news article
     const newNews = new News({
       title,
       content,
-      // publisher_id: new mongoose.Types.ObjectId(publisher_id),
+      avatar_id,
+      author,
       genres,
       imageUrls,
       videoUrls,
       real_probability,
+      created_at
     });
 
     await newNews.save();

@@ -9,7 +9,7 @@ import news from "./routes/newsRoute";
 import comment from "./routes/commentRoute";
 import vote from "./routes/voteRoute";
 import connectDB from './db';
-
+import allNews from "./routes/getallnews";
 
 const app = express();
 connectDB();
@@ -26,6 +26,7 @@ app.use(cors({
 // Routes
 app.use("/api/v1/user", user);
 // app.use("/api/v1/publisher", publisher);
+app.use("/api/v1/all", allNews);
 app.use("/api/v1/news", news);
 app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);

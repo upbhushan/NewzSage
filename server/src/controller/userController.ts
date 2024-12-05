@@ -13,6 +13,7 @@ const createUserSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
   government_id: z.string().optional(),
+  
 });
 
 const signinUserSchema = z.object({
@@ -52,9 +53,10 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
   try {
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-
+    const avatar_id = Math.floor(Math.random() * 10) + 1; // Assign a number between 1 to 10
     const newUser = new User({
       username,
+      avatar_id,
       email,
       password_hash,
       isPublisher: !!government_id,
@@ -64,7 +66,12 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     await newUser.save();
 
     const token = jwt.sign(
-      { user_id: newUser._id, isPublisher: newUser.isPublisher },
+      { user_id: newUser._id,
+        username: newUser.username,
+         isPublisher: newUser.isPublisher,
+         author: newUser.username,
+          avatar_id: newUser.avatar_id,
+         created_at: newUser.created_at,},
       JWT_SECRET,
       { expiresIn: "1d" }
     );

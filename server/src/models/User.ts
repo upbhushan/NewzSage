@@ -14,6 +14,7 @@ export interface IUser extends Document {
   updated_at: Date;
   last_login?: Date;
   government_id?: string;
+  avatar_id?: string;
   // publisher?: mongoose.Types.ObjectId;
   credibility?: mongoose.Types.ObjectId; // Reference to UserCredibility
 }
@@ -29,6 +30,7 @@ const UserSchema: Schema = new Schema(
     email_verified: { type: Boolean, default: false },
     last_login: { type: Date },
     government_id: { type: String, unique: true, sparse: true },
+    avatar_id: { type: String },
     // publisher: { type: Schema.Types.ObjectId, ref: 'Publisher' },
     credibility: { type: Schema.Types.ObjectId, ref: 'UserCredibility' }, // Added reference to UserCredibility
   },
