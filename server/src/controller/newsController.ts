@@ -1,22 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import News from '../models/News'; // Path to your News model
+import News from '../models/News';
 import mongoose from 'mongoose';
 
+// Updated schema with default values for optional fields
 const createNewsSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  publisher_id: z.string({ invalid_type_error: "Invalid publisher ID format" }),
-  genres: z.array(z.string()).optional(),
-  imageUrls: z.array(z.string()).optional(),
-  videoUrls: z.array(z.string()).optional(),
+  genres: z.array(z.string()).optional().default([]),
+  imageUrls: z.array(z.string()).optional().default([]),
+  videoUrls: z.array(z.string()).optional().default([]),
 });
 
 export const createNews = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const validation = createNewsSchema.safeParse(req.body);
 
   if (!validation.success) {
-    res.status(402).json({
+    res.status(400).json({
       errors: validation.error.errors.map((err) => ({
         path: err.path,
         message: err.message,
@@ -25,24 +25,28 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
     return;
   }
 
-  const { title, content, publisher_id } = validation.data;
+  const { title, content, genres, imageUrls, videoUrls } = validation.data;
+  const publisher_id = req.body.publisher_id; // Use publisher_id from middleware
 
   try {
-    // Check if the same news with the same title and content already exists
+    // Check for duplicate news
     const existingNews = await News.findOne({ title, content }).exec();
 
     if (existingNews) {
-      res.status(405).json({
+      res.status(409).json({
         error: "A news article with the same title and content already exists.",
       });
       return;
     }
 
-    // Proceed to create and save the new news article
+    // Create and save the new news article
     const newNews = new News({
       title,
       content,
       publisher_id: new mongoose.Types.ObjectId(publisher_id),
+      genres,
+      imageUrls,
+      videoUrls,
     });
 
     await newNews.save();
@@ -51,5 +55,4 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
-  next();
 };

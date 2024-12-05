@@ -54,7 +54,8 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
     const token = jwt.sign({ user_id: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
 
-    res.status(201).json({ newUser, token });
+    // Send the user_id and token in the response
+    res.status(201).json({ user_id: newUser._id, token });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
