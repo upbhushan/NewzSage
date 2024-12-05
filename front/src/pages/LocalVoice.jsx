@@ -5,7 +5,6 @@ import { PenTool, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "@/context/AuthContext"; // Assuming you have this for authentication context
-import cors from 'cors';
 
 export default function LocalVoice() {
   const { authUser } = useAuthContext();
@@ -15,9 +14,9 @@ export default function LocalVoice() {
   const [article, setArticle] = useState({
     title: '',
     content: '',
-    genres: [''],
-    imageUrls: [], // Start with an empty array for images
-    videoUrls: [], // Start with an empty array for videos
+    categories: [''],
+    images: [], // Start with an empty array for images
+    videos: [], // Start with an empty array for videos
   });
 
   // Function to handle input changes for dynamic fields
@@ -79,53 +78,56 @@ export default function LocalVoice() {
     });
   };
 
-  // Validate formData before sending
-const handleSubmit = async (event) => {
-  event.preventDefault();
-
-  // Ensure content is a string
-  const title = Array.isArray(article.title) ? article.title.join(' ') : article.title;
-  const content = Array.isArray(article.content) ? article.content.join(' ') : article.content;
-
-  // Prepare the payload
-  const payload = {
-    title: title || '',
-    content: content || '',
-    imageUrls: article.imageUrls.map(image => image.base64) || [],
-    videoUrls: article.videoUrls.map(video => video.base64) || [],
-  };
-
-  const token = localStorage.getItem('token');
-  if (!token) {
-    console.error('No authentication token found.');
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:3000/api/v1/news/post', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    console.log('Response:', response);
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error submitting article:', JSON.stringify(errorData, null, 2));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Validate the form data
+    if (!article.title || !article.content) {
+      console.error('Title and Content are required.');
       return;
     }
-
-    const responseData = await response.json();
-    console.log('Article Submitted:', responseData);
-    navigate('/');
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
   
+    // Prepare the payload
+    const payload = {
+      title: article.title,
+      content: article.content,
+      categories: article.categories.filter(category => category !== ''), // Remove empty categories
+      imageUrls: article.images,
+      videoUrls: article.videos,
+    };
+  
+    // Add token from localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No authentication token found.');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/news/post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error submitting article:', errorData);
+        return;
+      }
+  
+      const responseData = await response.json();
+      console.log('Article Submitted:', responseData);
+  
+      // Redirect after successful submission
+      navigate('/');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   
   const handleNavigateToSignUp = () => {
     navigate('/signup'); // Adjust path based on your routes
@@ -155,7 +157,7 @@ const handleSubmit = async (event) => {
                       type="text"
                       name="title"
                       value={article.title}
-                      onChange={(e) => handleInputChange(e, 0, 'title')}
+                      onChange={(e) => setArticle({ ...article, title: e.target.value })}
                       className="w-full p-3 border rounded-md"
                       placeholder="Enter article title"
                     />
@@ -166,7 +168,7 @@ const handleSubmit = async (event) => {
                     <textarea
                       name="content"
                       value={article.content}
-                      onChange={(e) => handleInputChange(e, 0, 'content')}
+                      onChange={(e) => setArticle({ ...article, content: e.target.value })}
                       className="w-full p-3 border rounded-md"
                       placeholder="Write your article content here"
                       rows={6}
@@ -176,7 +178,7 @@ const handleSubmit = async (event) => {
                   {/* Dynamic Category Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Categories</label>
-                    {article.genres.map((category, index) => (
+                    {article.categories.map((category, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="text"
@@ -186,7 +188,7 @@ const handleSubmit = async (event) => {
                           className="w-full p-3 border rounded-md"
                           placeholder="Enter category"
                         />
-                        {article.genres.length > 1 && (
+                        {article.categories.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('categories', index)}
@@ -211,7 +213,7 @@ const handleSubmit = async (event) => {
                   {/* Dynamic Image Upload Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Images</label>
-                    {article.imageUrls.map((image, index) => (
+                    {article.images.map((image, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="file"
@@ -219,7 +221,7 @@ const handleSubmit = async (event) => {
                           onChange={(e) => handleFileChange(e, index, 'images')}
                           className="w-full p-3 border rounded-md"
                         />
-                        {article.imageUrls.length > 1 && (
+                        {article.images.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('images', index)}
@@ -244,7 +246,7 @@ const handleSubmit = async (event) => {
                   {/* Dynamic Video Upload Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Videos</label>
-                    {article.videoUrls.map((video, index) => (
+                    {article.videos.map((video, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="file"
@@ -252,7 +254,7 @@ const handleSubmit = async (event) => {
                           onChange={(e) => handleFileChange(e, index, 'videos')}
                           className="w-full p-3 border rounded-md"
                         />
-                        {article.videoUrls.length > 1 && (
+                        {article.videos.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('videos', index)}
