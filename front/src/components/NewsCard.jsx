@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BiUpvote, BiDownvote } from 'react-icons/bi';
 import { FaRegComment } from 'react-icons/fa';
 import { PiShareFatLight } from 'react-icons/pi';
-import { useState } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -11,24 +10,69 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../context/AuthContext';
 
 export default function NewsCard({ news }) {
   const navigate = useNavigate();
-
+  const { authUser } = useAuthContext();
   const [votes, setVotes] = useState({
     upvotes: news.upvotes,
     downvotes: news.downvotes,
   });
+  const [userVote, setUserVote] = useState(null);
+  const [isVoting, setIsVoting] = useState(false);
 
-  const handleVote = (type) => {
-    setVotes((prev) => ({
-      ...prev,
-      [type]: prev[type] + 1,
-    }));
+  const handleVote = async (type) => {
+    if (!authUser) {
+      alert('Please log in to vote.');
+      return;
+    }
+
+    setIsVoting(true);
+    try {
+      const response = await fetch("http://localhost:3000/api/v1/vote/change", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          news_id: news.id,
+          user_id: authUser.id,
+          vote_type: type,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const { votes: updatedVotes, message } = data;
+        setVotes({
+          upvotes: updatedVotes.upvote_count,
+          downvotes: updatedVotes.downvote_count,
+        });
+
+        if (message.includes('updated')) {
+          setUserVote(type);
+        } else if (message.includes('added')) {
+          setUserVote(type);
+        } else {
+          setUserVote(null);
+        }
+      } else {
+        console.error('Vote Error:', data.message);
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while processing your vote.');
+    } finally {
+      setIsVoting(false);
+    }
   };
 
   const handleShare = () => {
-    const currentUrl = `${window.location.href}/content/${news.id}`;
+    const currentUrl = `${window.location.origin}/content/${news.id}`;
     if (navigator.share) {
       navigator
         .share({
@@ -56,7 +100,7 @@ export default function NewsCard({ news }) {
     >
       <div
         className={`grid gap-6 ${
-          news.media && news.media.length > 0 ? "md:grid-cols-2" : "grid-cols-1"
+          news.images && news.images.length > 0 ? "md:grid-cols-2" : "grid-cols-1"
         }`}
       >
         <div className="space-y-4">
@@ -100,8 +144,10 @@ export default function NewsCard({ news }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleVote("upvotes");
+                  handleVote("upvote");
                 }}
+                disabled={isVoting}
+                className={`${userVote === 'upvote' ? 'text-blue-500' : ''}`}
               >
                 <BiUpvote />
               </button>
@@ -109,14 +155,22 @@ export default function NewsCard({ news }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleVote("downvotes");
+                  handleVote("downvote");
                 }}
+                disabled={isVoting}
+                className={`${userVote === 'downvote' ? 'text-red-500' : ''}`}
               >
                 <BiDownvote />
               </button>
               <span className="text-sm font-medium">{votes.downvotes}</span>
             </div>
-            <div className="relative flex items-center bg-gray-500 text-white px-4 py-2 rounded-full space-x-2 group hover:bg-[#272729]">
+            <div 
+              className="relative flex items-center bg-gray-500 text-white px-4 py-2 rounded-full space-x-2 group hover:bg-[#272729]"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/news/${news.id}/comments`);
+              }}
+            >
               <FaRegComment />
               <span className="text-sm font-medium">{news.comments}</span>
             </div>
@@ -134,39 +188,26 @@ export default function NewsCard({ news }) {
         </div>
 
         {/* Media Carousel */}
-        {news.media && news.media.length > 0 && (
+        {news.images && news.images.length > 0 && (
           <div
             onClick={(e) => e.stopPropagation()} // Prevent parent onClick
           >
             <Carousel>
               <CarouselContent>
-                {news.media.map((item, index) => (
+                {news.images.map((image, index) => (
                   <CarouselItem
                     key={index}
                     className="flex justify-center items-center bg-gray-300 rounded-md"
                   >
-                    {item.type === "image" ? (
-                      <img
-                        src={item.url}
-                        alt={`Media ${index + 1}`}
-                        className="max-h-[250px] max-w-full object-contain rounded-md cursor-zoom-in"
-                        style={{
-                          height: "250px",
-                          width: "auto",
-                        }}
-                      />
-                    ) : item.type === "video" ? (
-                      <video
-                        controls
-                        className="rounded-md cursor-pointer"
-                        style={{
-                          height: "250px",
-                          width: "1200px",
-                          objectFit: "contain",
-                        }}
-                        src={item.url}
-                      />
-                    ) : null}
+                    <img
+                      src={image.url}
+                      alt={`Media ${index + 1}`}
+                      className="max-h-[250px] max-w-full object-contain rounded-md cursor-zoom-in"
+                      style={{
+                        height: "250px",
+                        width: "auto",
+                      }}
+                    />
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -179,3 +220,4 @@ export default function NewsCard({ news }) {
     </div>
   );
 }
+
