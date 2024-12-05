@@ -13,7 +13,6 @@ export default function SignIn() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    dob: '',
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -29,12 +28,31 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    const { email, password } = formData;
+  
     try {
-      // Here you would typically make an API call to your authentication endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      navigate('/dashboard');
+      // Sending credentials to the backend for authentication
+      const response = await fetch('http://localhost:3000/api/v1/user/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Sign in failed. Please try again.');
+      }
+  
+      const data = await response.json();
+  
+      // On successful sign-in, navigate to landing page
+      // Store JWT token in localStorage or cookies if necessary
+      localStorage.setItem('token', data.token); // Example, adjust based on response
+      navigate('/landingpage');
     } catch (err) {
-      setError('Sign in failed. Please try again.');
+      setError(err.message);
     }
   };
 
@@ -48,7 +66,7 @@ export default function SignIn() {
       
       // Here you would typically send the token to your backend
       console.log('Google Sign In successful', profile);
-      navigate('/dashboard');
+      navigate('/landingpage');
     } catch (err) {
       setError('Google sign in failed. Please try again.');
     }

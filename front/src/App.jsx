@@ -32,21 +32,20 @@ function App() {
             {/* {isAuthenticated && <Sidebar />} */}
             <div className="flex-1 ">
               <Routes>
-              <Route path="/" element={<NoSign isAuthenticated={isAuthenticated} />} />
+              <Route path="/" element={isAuthenticated? <Navigate to= "/landingpage"/>: <NoSign/>} />
 
                 {/* <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} /> */}
                 <Route 
-                  path="/home" 
-                  element={isAuthenticated ? <Home /> : <Navigate to="/signin" />} 
+                  path="/landingpage" 
+                  element={isAuthenticated ? <LandingPage /> : <Navigate to="/" />} 
                 />
                 <Route 
                   path="/submit" 
-                  element={isAuthenticated ? <SubmitNews /> : <Navigate to="/signin" />} 
+                  element={isAuthenticated ? <SubmitNews /> : <Navigate to="/" />} 
                 />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/content" element={<Content />} />
-                <Route path="/nosign" element={<NoSign />} />
+                <Route path="/signup" element={isAuthenticated? <Navigate to= "/landingpage"/>: <SignUp/>} />
+                <Route path="/signin" element={isAuthenticated? <Navigate to= "/landingpage"/>: <SignIn/>} />
+                <Route path="/content" element={  isAuthenticated? <Content />:  <Navigate to= "/"/>     } />
               </Routes>
             </div>
           </div>
