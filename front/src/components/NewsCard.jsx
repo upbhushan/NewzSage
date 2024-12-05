@@ -105,7 +105,7 @@ export default function NewsCard({ news }) {
               >
                 <BiUpvote />
               </button>
-              <span className="text-sm font-medium">{votes.upvotes - votes.downvotes}</span>
+              <span className="text-sm font-medium">{votes.upvotes}</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -114,6 +114,7 @@ export default function NewsCard({ news }) {
               >
                 <BiDownvote />
               </button>
+              <span className="text-sm font-medium">{votes.downvotes}</span>
             </div>
             <div className="relative flex items-center bg-gray-500 text-white px-4 py-2 rounded-full space-x-2 group hover:bg-[#272729]">
               <FaRegComment />

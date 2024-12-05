@@ -18,4 +18,7 @@ const VoteSchema: Schema = new Schema(
   { timestamps: { createdAt: 'created_at', updatedAt: false } }
 );
 
+// Add a unique index to prevent duplicate votes by the same user on the same news item
+// VoteSchema.index({ news_id: 1, user_id: 1 }, { unique: true });
+
 export default mongoose.model<IVote>('Vote', VoteSchema, 'votes');

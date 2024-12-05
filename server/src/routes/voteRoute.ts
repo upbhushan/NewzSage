@@ -1,9 +1,11 @@
-import { Router } from 'express';
-import { createVote } from '../controller/voteController';
+// routes/votes.ts
+
+import express from 'express';
+import  {handleVote}  from '../controller/voteController';
 import { authMiddleware } from '../middlewares/authmiddleware';
 
-const router = Router();
+const router = express.Router();
 
-router.post('/',authMiddleware, createVote);
+router.post('/change',authMiddleware, handleVote);
 
 export default router;
