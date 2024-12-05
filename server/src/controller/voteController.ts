@@ -1,20 +1,18 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import Vote from '../models/Vote'; // Assuming a Mongoose Vote model is defined in `models/Vote`
 
 const createVoteSchema = z.object({
-  news_id: z.string({ invalid_type_error: "Invalid user ID format" }),
+  news_id: z.string({ invalid_type_error: "Invalid news ID format" }),
   user_id: z.string({ invalid_type_error: "Invalid user ID format" }),
   vote_type: z.enum(['upvote', 'downvote']),
 });
 
-export const createVote = async (req: Request, res: Response):Promise<void> => {
+export const createVote = async (req: Request, res: Response): Promise<void> => {
   const validation = createVoteSchema.safeParse(req.body);
 
   if (!validation.success) {
-     res.status(400).json({
+    res.status(400).json({
       errors: validation.error.errors.map((err) => ({
         path: err.path,
         message: err.message,
@@ -26,9 +24,13 @@ export const createVote = async (req: Request, res: Response):Promise<void> => {
   const { news_id, user_id, vote_type } = validation.data;
 
   try {
-    const newVote = await prisma.vote.create({
-      data: { news_id: parseInt(news_id), user_id: parseInt(user_id), vote_type },
+    const newVote = new Vote({
+      news_id,
+      user_id,
+      vote_type,
     });
+
+    await newVote.save();
 
     res.status(201).json(newVote);
   } catch (error) {

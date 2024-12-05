@@ -4,18 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
-var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var JWT_SECRET = "asjfblansfjklasj";
-var authMiddleware = function (req, res, next) {
-    var authHeader = req.headers.authorization;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const JWT_SECRET = "asjfblansfjklasj";
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         console.log(authHeader);
         res.status(406).json({ error: 'Access denied. No token provided.' });
         return;
     }
-    var token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];
     try {
-        var decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        const decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
         req.user_id = decoded.user_id;
         next();
     }

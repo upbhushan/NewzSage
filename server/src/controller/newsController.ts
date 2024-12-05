@@ -1,39 +1,55 @@
-import { Request, Response,NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import News from '../models/News'; // Path to your News model
+import mongoose from 'mongoose';
 
 const createNewsSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  image_url: z.string().url("Invalid image URL"),
-  publisher_id: z.string({ invalid_type_error: "Invalid user ID format" }),
+  publisher_id: z.string({ invalid_type_error: "Invalid publisher ID format" }),
+  genres: z.array(z.string()).optional(),
+  imageUrls: z.array(z.string()).optional(),
+  videoUrls: z.array(z.string()).optional(),
 });
 
-export const createNews = async (req: Request, res: Response,next:NextFunction) : Promise<void> => {
+export const createNews = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const validation = createNewsSchema.safeParse(req.body);
 
   if (!validation.success) {
-     res.status(400).json({
+    res.status(402).json({
       errors: validation.error.errors.map((err) => ({
         path: err.path,
         message: err.message,
       })),
     });
-    return ;
+    return;
   }
 
-  const { title, content, image_url, publisher_id } = validation.data;
+  const { title, content, publisher_id } = validation.data;
 
   try {
-    const newNews = await prisma.news.create({
-      data: { title, content, image_url, publisher_id: Number(publisher_id) },
+    // Check if the same news with the same title and content already exists
+    const existingNews = await News.findOne({ title, content }).exec();
+
+    if (existingNews) {
+      res.status(405).json({
+        error: "A news article with the same title and content already exists.",
+      });
+      return;
+    }
+
+    // Proceed to create and save the new news article
+    const newNews = new News({
+      title,
+      content,
+      publisher_id: new mongoose.Types.ObjectId(publisher_id),
     });
 
+    await newNews.save();
+
     res.status(201).json(newNews);
-    next();
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
+  next();
 };

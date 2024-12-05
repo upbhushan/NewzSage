@@ -1,27 +1,25 @@
-import { Request, Response,NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { z } from 'zod';
+import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-const JWT_SECRET: string = "asjfblansfjklasj";
+import { z } from 'zod';
+import User from '../models/User'; // Assuming a Mongoose User model is defined in `models/User`
 
-const prisma = new PrismaClient();
+const JWT_SECRET = "asjfblansfjklasj";
 const SALT_ROUNDS = 10;
 
-// next: NextFunction (for middleware)
+// Validation Schemas
 const createUserSchema = z.object({
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-  const singinUserSchema = z.object({
-    email: z.string().email("Invalid email format"),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-  })
+const signinUserSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+});
 
-export const createUser = async (req: Request, res: Response ) : Promise<void> => {
-
+export const createUser = async (req: Request, res: Response): Promise<void> => {
   const validation = createUserSchema.safeParse(req.body);
 
   if (!validation.success) {
@@ -36,39 +34,35 @@ export const createUser = async (req: Request, res: Response ) : Promise<void> =
 
   const { username, email, password } = validation.data;
 
-  const existinguser = await prisma.user.findUnique({
-    where: { email,
-              username
-     },
-  });
+  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
 
-  if(existinguser){
-    res.json({error: "User already exists"});
+  if (existingUser) {
+    res.status(400).json({ error: "User already exists" });
+    return;
   }
 
   try {
-
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
-
-    const newUser = await prisma.user.create({
-      data: { username, email, password_hash },
+    const newUser = new User({
+      username,
+      email,
+      password_hash,
     });
 
-    const token = jwt.sign({
-      user_id:existinguser?.user_id
-    }
-      ,JWT_SECRET);
+    await newUser.save();
 
-    res.status(201).json({newUser,token});
+    const token = jwt.sign({ user_id: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
+
+    res.status(201).json({ newUser, token });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
-  
 };
 
-export const signinUser=async(req:Request,res:Response):Promise<void>=>{
-  const validation = singinUserSchema.safeParse(req.body);
+export const signinUser = async (req: Request, res: Response): Promise<void> => {
+  const validation = signinUserSchema.safeParse(req.body);
+
   if (!validation.success) {
     res.status(400).json({
       errors: validation.error.errors.map((err) => ({
@@ -78,40 +72,34 @@ export const signinUser=async(req:Request,res:Response):Promise<void>=>{
     });
     return;
   }
-  const {email,password} = validation.data;
 
+  const { email, password } = validation.data;
 
-  const existinguser = await prisma.user.findUnique({
-    where: { email,
-     },
-  });
+  const existingUser = await User.findOne({ email });
 
-  if(!existinguser){
-    res.json({error:"User Does not exist"});
+  if (!existingUser) {
+    res.status(404).json({ error: "User does not exist" });
     return;
   }
 
-  const passwordMatch = await bcrypt.compare(password, existinguser.password_hash);
+  const passwordMatch = await bcrypt.compare(password, existingUser.password_hash);
 
-  if(!passwordMatch){
-    res.json({error:"Password does not match"});
+  if (!passwordMatch) {
+    res.status(401).json({ error: "Password does not match" });
+    return;
   }
-  
-  const token = jwt.sign({
-    user_id:existinguser?.user_id
-  },JWT_SECRET);
-  res.json({message : "User signed in",token});
-  
 
+  const token = jwt.sign({ user_id: existingUser._id }, JWT_SECRET, { expiresIn: "1d" });
 
-}
+  res.status(200).json({ message: "User signed in", token });
+};
 
-export const getUsers = async (req: Request, res: Response,next: NextFunction):Promise<void> => {
+export const getUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await User.find({}, { password_hash: 0 }); // Exclude `password_hash` from results
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
-  next();    
+  next();
 };

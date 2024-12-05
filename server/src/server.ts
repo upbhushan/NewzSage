@@ -8,9 +8,9 @@ import publisher from "./routes/publisherRoute";
 import news from "./routes/newsRoute";
 import comment from "./routes/commentRoute";
 import vote from "./routes/voteRoute";
-
+import connectDB from './db';
 const app = express();
-
+connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors());

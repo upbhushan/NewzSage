@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { z } from 'zod';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 
 const JWT_SECRET_PUB = "asjfblansfjklasj";
-
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
+// Mongoose Models
+import Publisher from '../models/Publisher'; // Assuming a Publisher model is defined in `models/Publisher`
+
+// Validation Schemas
 const createPublisherSchema = z.object({
   user_id: z.string({ invalid_type_error: "Invalid user ID format" }),
   government_id: z.string().min(6, "Government ID must be at least 6 characters long"),
@@ -34,13 +36,13 @@ export const createPublisher = async (req: Request, res: Response, next: NextFun
     const hashedGovernmentId = await bcrypt.hash(government_id, SALT_ROUNDS);
     const hashedJournalismId = await bcrypt.hash(journalism_id, SALT_ROUNDS);
 
-    const newPublisher = await prisma.publisher.create({
-      data: {
-        user_id: parseInt(user_id, 10),
-        government_id: hashedGovernmentId,
-        journalism_id: hashedJournalismId,
-      },
+    const newPublisher = new Publisher({
+      user_id: new mongoose.Types.ObjectId(user_id),
+      government_id: hashedGovernmentId,
+      journalism_id: hashedJournalismId,
     });
+
+    await newPublisher.save();
 
     const token = jwt.sign({ user_id }, JWT_SECRET_PUB, { expiresIn: "1d" });
 
@@ -72,9 +74,7 @@ export const signInPublisher = async (req: Request, res: Response, next: NextFun
   const { publisher_id, government_id } = validation.data;
 
   try {
-    const publisher = await prisma.publisher.findFirst({
-      where: { publisher_id: parseInt(publisher_id, 10) },
-    });
+    const publisher = await Publisher.findById(publisher_id);
 
     if (!publisher) {
       res.status(404).json({ error: "Publisher not found" });
