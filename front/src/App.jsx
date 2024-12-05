@@ -27,27 +27,45 @@ function App() {
     <RecoilRoot>
       <Router>
         <div className="min-h-screen bg-gray-100 font-serif">
-          {/* {!isAuthenticated && <Header />} */}
-          <div className="flex">
-            {/* {isAuthenticated && <Sidebar />} */}
-            <div className="flex-1 ">
-              <Routes>
-              <Route path="/" element={isAuthenticated? <Navigate to= "/landingpage"/>: <NoSign/>} />
+          {!isAuthenticated && <Header />} {/* Show Header only if not authenticated */}
 
-                {/* <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} /> */}
-                <Route 
-                  path="/landingpage" 
-                  element={isAuthenticated ? <LandingPage /> : <Navigate to="/" />} 
-                />
-                <Route 
-                  path="/submit" 
-                  element={isAuthenticated ? <SubmitNews /> : <Navigate to="/" />} 
-                />
-                <Route path="/signup" element={isAuthenticated? <Navigate to= "/landingpage"/>: <SignUp/>} />
-                <Route path="/signin" element={isAuthenticated? <Navigate to= "/landingpage"/>: <SignIn/>} />
-                <Route path="/content" element={  isAuthenticated? <Content />:  <Navigate to= "/"/>     } />
-              </Routes>
-            </div>
+          <div className="flex">
+            {/* Conditionally render Sidebar only if authenticated and on allowed pages */}
+            {isAuthenticated && (
+              <>
+                <Sidebar /> {/* Sidebar visible only for authenticated users */}
+                <div className="flex-1 pl-3 pr-6">
+                  <Routes>
+                    <Route path="/" element={isAuthenticated ? <Navigate to="/landingpage" /> : <NoSign />} />
+                    <Route path="/signup" element={isAuthenticated ? <Navigate to="/landingpage" /> : <SignUp />} />
+                    <Route path="/signin" element={isAuthenticated ? <Navigate to="/landingpage" /> : <SignIn />} />
+                    <Route
+                      path="/landingpage"
+                      element={isAuthenticated ? <LandingPage /> : <Navigate to="/" />}
+                    />
+                    <Route
+                      path="/submit"
+                      element={isAuthenticated ? <SubmitNews /> : <Navigate to="/" />}
+                    />
+                    <Route
+                      path="/content"
+                      element={isAuthenticated ? <Content /> : <Navigate to="/" />}
+                    />
+                  </Routes>
+                </div>
+              </>
+            )}
+            {/* If not authenticated, only show routes that don’t require Sidebar */}
+            {!isAuthenticated && (
+              <div className="flex-1 pl-3 pr-6">
+                <Routes>
+                  <Route path="/" element={isAuthenticated ? <Navigate to="/landingpage" /> : <NoSign />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/signin" element={<SignIn />} />
+                  <Route path="/landingpage" element={isAuthenticated ? <LandingPage /> : <Navigate to="/" />} />
+                </Routes>
+              </div>
+            )}
           </div>
         </div>
       </Router>

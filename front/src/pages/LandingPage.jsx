@@ -4,6 +4,7 @@ import { Edit, BarChart2, Eye } from 'lucide-react';
 import { useNews } from '../hooks/useNews';
 import NewsCard from '../components/NewsCard';
 import { Skeleton } from "@/components/ui/skeleton"
+import Sidebar from '@/components/Sidebar';
 
 
 
@@ -22,6 +23,7 @@ function FeatureCard({ icon, title, description }) {
 
 function FeaturesSection() {
   return (
+    
     <section className="my-12">
       <h2 className="text-3xl font-bold mb-6 text-center text-black">Why NewzSage?</h2>
       <div className="grid gap-8 md:grid-cols-3">
@@ -45,10 +47,11 @@ function FeaturesSection() {
   );
 }
 
-export default function LandingPage({ isAuthenticated }) {
+export default function LandingPage() {
   const { news, loading, error } = useNews();
 
   return (
+    <>
     <main className="min-h-screen bg-gray-100 py-8">
       <div className="container mx-auto px-4">
         {loading ? (
@@ -64,8 +67,9 @@ export default function LandingPage({ isAuthenticated }) {
         )}
         <FeaturesSection />
       </div>
-      {!isAuthenticated && <Footer />}
+      { <Footer />}
     </main>
+    </>
   );
 }
 
