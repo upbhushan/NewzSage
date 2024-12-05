@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MdAddCircleOutline, MdOutlineRemoveCircleOutline } from "react-icons/md";
-import { PenTool, Users, MessageCircle } from 'lucide-react';
+import { PenTool, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "@/context/AuthContext"; // Assuming you have this for authentication context
@@ -14,9 +14,9 @@ export default function LocalVoice() {
   const [article, setArticle] = useState({
     title: '',
     content: '',
-    categories: [''], // Start with one input field for category
-    imageUrls: [''], // Start with one input field for image
-    videoUrls: [''], // Start with one input field for video
+    categories: [''],
+    images: [], // Start with an empty array for images
+    videos: [], // Start with an empty array for videos
   });
 
   // Function to handle input changes for dynamic fields
@@ -27,6 +27,39 @@ export default function LocalVoice() {
       updatedValues[index] = value;
       return { ...prev, [type]: updatedValues };
     });
+  };
+
+  // Function to handle file uploads to Cloudinary
+  const uploadToCloudinary = (file, type) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'newzsage'); // Replace with your Cloudinary preset
+
+    return fetch('https://api.cloudinary.com/v1_1/dfo0mxuix/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        return data.secure_url; // Cloudinary URL
+      })
+      .catch((error) => {
+        console.error('Error uploading to Cloudinary:', error);
+        return null;
+      });
+  };
+
+  // Function to handle file selection and upload
+  const handleFileChange = async (e, index, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      const cloudinaryUrl = await uploadToCloudinary(file, type);
+      if (cloudinaryUrl) {
+        const updatedFiles = [...article[type]];
+        updatedFiles[index] = cloudinaryUrl;
+        setArticle((prev) => ({ ...prev, [type]: updatedFiles }));
+      }
+    }
   };
 
   // Function to add new input fields for categories, images, and videos
@@ -45,13 +78,74 @@ export default function LocalVoice() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle article submission
-    console.log("Article Submitted", article);
-    // You can integrate with an API to submit the article
+  
+    // Validate the form data
+    if (!article.title || !article.content) {
+      console.error('Title and Content are required.');
+      return;
+    }
+  
+    // if (article.images.length === 0) {
+    //   console.error('At least one image URL is required.');
+    //   return;
+    // }
+  
+    // if (article.videos.length === 0) {
+    //   console.error('At least one video URL is required.');
+    //   return;
+    // }
+  
+    // if (article.categories.length === 0) {
+    //   console.error('At least one category is required.');
+    //   return;
+    // }
+  
+    // Prepare formData to send
+    const formData = new FormData();
+    formData.append('title', article.title);
+    formData.append('content', article.content);
+  
+    // Convert arrays to comma-separated strings for submission
+    formData.append('categories', article.categories.join(',')); // Categories as a comma-separated string
+    formData.append('images', article.images.join(',')); // Images as a comma-separated string
+    formData.append('videos', article.videos.join(',')); // Videos as a comma-separated string
+  
+    // Add token from localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No authentication token found.');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/news/post', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error submitting article:', errorData);
+        return;
+      }
+  
+      const responseData = await response.json();
+      console.log('Article Submitted:', responseData);
+  
+      // Redirect after successful submission
+      navigate('/');
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
-
+  
+  
+  
   const handleNavigateToSignUp = () => {
     navigate('/signup'); // Adjust path based on your routes
   };
@@ -98,7 +192,7 @@ export default function LocalVoice() {
                     />
                   </div>
 
-                  {/* Dynamic Category URL Fields */}
+                  {/* Dynamic Category Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Categories</label>
                     {article.categories.map((category, index) => (
@@ -133,23 +227,21 @@ export default function LocalVoice() {
                     </Button>
                   </div>
 
-                  {/* Dynamic Image URL Fields */}
+                  {/* Dynamic Image Upload Fields */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">Image URLs</label>
-                    {article.imageUrls.map((imageUrl, index) => (
+                    <label className="block text-sm font-medium mb-2">Images</label>
+                    {article.images.map((image, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
-                          type="url"
-                          name="imageUrls"
-                          value={imageUrl}
-                          onChange={(e) => handleInputChange(e, index, 'imageUrls')}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange(e, index, 'images')}
                           className="w-full p-3 border rounded-md"
-                          placeholder="Enter image URL"
                         />
-                        {article.imageUrls.length > 1 && (
+                        {article.images.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => removeInputField('imageUrls', index)}
+                            onClick={() => removeInputField('images', index)}
                             className="text-red-500"
                           >
                             <MdOutlineRemoveCircleOutline className="w-6 h-6" />
@@ -160,7 +252,7 @@ export default function LocalVoice() {
 
                     <Button
                       type="button"
-                      onClick={() => addInputField('imageUrls')}
+                      onClick={() => addInputField('images')}
                       className="flex items-center space-x-2"
                     >
                       <MdAddCircleOutline className="w-6 h-6" />
@@ -168,23 +260,21 @@ export default function LocalVoice() {
                     </Button>
                   </div>
 
-                  {/* Dynamic Video URL Fields */}
+                  {/* Dynamic Video Upload Fields */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">Video URLs</label>
-                    {article.videoUrls.map((videoUrl, index) => (
+                    <label className="block text-sm font-medium mb-2">Videos</label>
+                    {article.videos.map((video, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
-                          type="url"
-                          name="videoUrls"
-                          value={videoUrl}
-                          onChange={(e) => handleInputChange(e, index, 'videoUrls')}
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => handleFileChange(e, index, 'videos')}
                           className="w-full p-3 border rounded-md"
-                          placeholder="Enter video URL"
                         />
-                        {article.videoUrls.length > 1 && (
+                        {article.videos.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => removeInputField('videoUrls', index)}
+                            onClick={() => removeInputField('videos', index)}
                             className="text-red-500"
                           >
                             <MdOutlineRemoveCircleOutline className="w-6 h-6" />
@@ -195,7 +285,7 @@ export default function LocalVoice() {
 
                     <Button
                       type="button"
-                      onClick={() => addInputField('videoUrls')}
+                      onClick={() => addInputField('videos')}
                       className="flex items-center space-x-2"
                     >
                       <MdAddCircleOutline className="w-6 h-6" />
@@ -203,43 +293,24 @@ export default function LocalVoice() {
                     </Button>
                   </div>
 
-                  <Button type="submit" className="w-full">Publish Article</Button>
+                  <div className="mt-6">
+                    <Button type="submit" className="w-full py-3">
+                      Submit Article
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
           </div>
         ) : (
-          <div className="bg-muted p-8 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Join Our Community</h2>
-            <p className="mb-6">
-              Only registered users can publish articles. Join our platform and be part of the local voice revolution.
-            </p>
-            <Button size="lg" onClick={handleNavigateToSignUp}>Get Started Today</Button>
+          <div className="flex flex-col items-center justify-center space-y-6">
+            <h3 className="text-xl font-semibold text-center">Please sign up to share your voice!</h3>
+            <Button onClick={handleNavigateToSignUp} className="w-52 flex items-center justify-center space-x-2">
+              <Users className="w-5 h-5" />
+              <span>Sign Up</span>
+            </Button>
           </div>
         )}
-
-        {/* Information about the platform */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <Card>
-            <CardContent className="p-6">
-              <PenTool className="w-12 h-12 mb-4 text-primary" />
-              <h3 className="text-xl font-semibold mb-2">Create Content</h3>
-              <p>
-                Share your local insights, stories, and news with the community. It’s a place for everyone to be heard.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <Users className="w-12 h-12 mb-4 text-primary" />
-              <h3 className="text-xl font-semibold mb-2">Our Community</h3>
-              <p>
-                A vibrant community where voices are united for a cause—promoting truth and transparency in news.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
