@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import News from '../models/News';
 import mongoose from 'mongoose';
-
+import { getClaimScore } from '../api/apicall';
 // Updated schema with default values for optional fields
 const createNewsSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -38,6 +38,20 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
       });
       return;
     }
+    // get claim score from API
+    const claimScoreData = await getClaimScore(content);
+    let real_probability = 0;
+    if (
+      claimScoreData &&
+      Array.isArray(claimScoreData.results) &&
+      claimScoreData.results.length > 0 &&
+      typeof claimScoreData.results[0].score === 'number'
+    ) {
+      real_probability = claimScoreData.results[0].score;
+    } else {
+      console.warn("Unexpected claim score API response format:", claimScoreData);
+    }
+    console.log("Claim score:", real_probability);
 
     // Create and save the new news article
     const newNews = new News({
@@ -47,6 +61,7 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
       genres,
       imageUrls,
       videoUrls,
+      real_probability,
     });
 
     await newNews.save();
