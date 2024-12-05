@@ -8,10 +8,12 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
+import Content from './pages/Content';
+// import Context from './components/Context';
 import './index.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true );
 
   const handleAuthentication = () => {
     setIsAuthenticated(true);
@@ -24,7 +26,7 @@ function App() {
           {!isAuthenticated && <Header />}
           <div className="flex">
             {isAuthenticated && <Sidebar /> }
-            <div className="flex-1">
+            <div className="flex-1 pl-3 pr-6">
               <Routes>
                 <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />
                 <Route 
@@ -37,6 +39,8 @@ function App() {
                 />
                 <Route path="/signup" element={<SignUp onSignUp={handleAuthentication} />} />
                 <Route path="/signin" element={<SignIn onSignIn={handleAuthentication} />} />
+                <Route path='/content' element={<Content/>}/>
+                {/* <Route path='/context' element={<Context/>}/> */}
               </Routes>
             </div>
           </div>
