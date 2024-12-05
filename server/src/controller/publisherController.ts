@@ -12,7 +12,7 @@ import Publisher from '../models/Publisher'; // Assuming a Publisher model is de
 
 // Validation Schemas
 const createPublisherSchema = z.object({
-  user_id: z.string({ invalid_type_error: "Invalid user ID format" }),
+  // user_id: z.string({ invalid_type_error: "Invalid user ID format" }),
   government_id: z.string().min(6, "Government ID must be at least 6 characters long"),
   journalism_id: z.string().min(6, "Journalism ID must be at least 6 characters long"),
 });
@@ -30,21 +30,29 @@ export const createPublisher = async (req: Request, res: Response, next: NextFun
     return;
   }
 
-  const { user_id, government_id, journalism_id } = validation.data;
+  const {  government_id, journalism_id } = validation.data;
 
   try {
+
+    const existingPublisher = await Publisher.findOne({ government_id});
+    if (existingPublisher) {
+      res.status(409).json({
+        error: "A publisher with this government ID already exists.",
+      });
+      return;
+    }
     const hashedGovernmentId = await bcrypt.hash(government_id, SALT_ROUNDS);
     const hashedJournalismId = await bcrypt.hash(journalism_id, SALT_ROUNDS);
 
     const newPublisher = new Publisher({
-      user_id: new mongoose.Types.ObjectId(user_id),
+      // user_id: new mongoose.Types.ObjectId(user_id),
       government_id: hashedGovernmentId,
       journalism_id: hashedJournalismId,
     });
 
     await newPublisher.save();
 
-    const token = jwt.sign({ user_id }, JWT_SECRET_PUB, { expiresIn: "1d" });
+    const token = jwt.sign({ user_id : newPublisher._id}, JWT_SECRET_PUB, { expiresIn: "1d" });
 
     res.status(201).json({ newPublisher, token });
     next();
