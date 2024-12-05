@@ -30,7 +30,7 @@ function App() {
           {/* {!isAuthenticated && <Header />} */}
           <div className="flex">
             {/* {isAuthenticated && <Sidebar />} */}
-            <div className="flex-1 pl-3 pr-6">
+            <div className="flex-1 ">
               <Routes>
               <Route path="/" element={<NoSign isAuthenticated={isAuthenticated} />} />
 

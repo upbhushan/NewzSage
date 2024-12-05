@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export default function Hero() {
+    const navigate = useNavigate();
   return (
     <main className="flex-grow container mx-auto py-12 px-4 flex flex-col md:flex-row items-stretch justify-between">
       <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-center">
@@ -31,15 +33,18 @@ export default function Hero() {
             <span className="px-4 text-gray-500">or</span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
-          <button className="w-full bg-blue-600 text-white rounded-full px-4 py-2 hover:bg-blue-700">
-            Create account
-          </button>
+          <button
+              className="w-full bg-blue-600 text-white rounded-full px-4 py-2 hover:bg-blue-700"
+              onClick={() => navigate('/signup')}
+            >
+              Create account
+            </button>
           <p className="mt-4 text-xs text-gray-500">
             By signing up, you agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>, including <a href="#" className="text-blue-600 hover:underline">Cookie Use</a>.
           </p>
           <div className="mt-8">
             <h4 className="font-bold mb-2">Already have an account?</h4>
-            <a href="#" className="w-full block text-center border border-blue-600 text-blue-600 rounded-full px-4 py-2 hover:bg-blue-50">
+            <a href="/signin" className="w-full block text-center border border-blue-600 text-blue-600 rounded-full px-4 py-2 hover:bg-blue-50">
               Sign in
             </a>
           </div>

@@ -5,6 +5,9 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import Header from '@/components/Header';
+import { Link } from 'react-router-dom';
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -59,6 +62,8 @@ export default function SignUp() {
   };
 
   return (
+    <>
+    <Header/>
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         
@@ -166,10 +171,23 @@ export default function SignUp() {
                 </svg>
                 Sign up with Google
               </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <Link to="/signin" className="px-2 bg-white text-gray-500 hover:text-blue-500">
+                    Already have an account?
+                  </Link>
+                </div>
+              </div>
+              
             </form>
           </CardContent>
         </Card>
       </div>
     </div>
+    </>
   );
 }
