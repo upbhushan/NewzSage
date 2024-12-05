@@ -1,130 +1,202 @@
-import React from 'react';
-import { FaUsers, FaThumbsUp, FaComment, FaPoll, FaShareAlt } from 'react-icons/fa'; // Icons from react-icons
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import {
+  Card,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { FaCheckCircle, FaInfoCircle, FaChartBar, FaCogs } from "react-icons/fa"; // Add icons
 
-const CommunityInsights = () => {
+const Text = ({ children, className }) => (
+  <p className={className}>{children}</p>
+);
+
+const AccuracyProbability = () => {
   return (
-    <div className="container mx-auto p-6">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800">Community Insights</h1>
-        <p className="text-lg text-gray-600 mt-2">Explore key metrics and interactions within our community.</p>
+    <div className="container mx-auto p-6 bg-gray-50">
+      <header className="text-center mb-12">
+        <h1 className="text-5xl font-extrabold text-green-600">
+          Model Performance - Accuracy & Probability
+        </h1>
+        <p className="text-lg text-gray-600 mt-4">
+          Explore the performance of different classifiers, metrics, and features.
+        </p>
       </header>
 
-      {/* Community Engagement Section */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <Card className="shadow-xl bg-gray-100 text-gray-800">
-          <CardHeader>
-            <div className="flex items-center mb-4">
-              <FaUsers className="text-4xl mr-4 text-gray-600" />
-              <CardTitle className="text-2xl">Active Users</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>
-              Over 10,000 active users engaging with content daily.
-            </CardDescription>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-
-        <Card className="shadow-xl bg-gray-100 text-gray-800">
-          <CardHeader>
-            <div className="flex items-center mb-4">
-              <FaThumbsUp className="text-4xl mr-4 text-gray-600" />
-              <CardTitle className="text-2xl">Likes & Reactions</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>
-              Over 25,000 likes on recent articles, showing strong community support.
-            </CardDescription>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-
-        <Card className="shadow-xl bg-gray-100 text-gray-800">
-          <CardHeader>
-            <div className="flex items-center mb-4">
-              <FaComment className="text-4xl mr-4 text-gray-600" />
-              <CardTitle className="text-2xl">Comments & Discussions</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>
-              Over 5,000 comments and discussions happening every week.
-            </CardDescription>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-      </section>
-
-      {/* Polls & Feedback Section */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <Card className="shadow-xl bg-gray-100 text-gray-800">
-          <CardHeader>
-            <div className="flex items-center mb-4">
-              <FaPoll className="text-4xl mr-4 text-gray-600" />
-              <CardTitle className="text-2xl">Community Polls</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>
-              85% of users prefer more personalized content in future updates.
-            </CardDescription>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-
-        <Card className="shadow-xl bg-gray-100 text-gray-800">
-          <CardHeader>
-            <div className="flex items-center mb-4">
-              <FaShareAlt className="text-4xl mr-4 text-gray-600" />
-              <CardTitle className="text-2xl">Content Sharing</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>
-              Over 3,000 shares per month, spreading our content across multiple platforms.
-            </CardDescription>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
-      </section>
-
-      {/* Key Insights */}
-      <section className="mb-12">
-        <h2 className="text-3xl font-semibold mb-4 text-gray-800">Key Insights</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="p-6 bg-gray-100 border border-gray-300 rounded-lg shadow-md text-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl">User Growth</CardTitle>
-            </CardHeader>
+      {/* Naive Bayes Section */}
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaCheckCircle className="inline-block text-green-500 mr-2" />
+          Naive Bayes Classifier
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-shadow duration-300">
             <CardContent>
-              <CardDescription>
-                Our community has seen a <strong>25%</strong> growth in the last 3 months, with most growth from international users.
-              </CardDescription>
+              <CardTitle>Accuracy</CardTitle>
+              <Text className="text-lg text-gray-700">
+                The Naive Bayes model achieved an accuracy of approximately{" "}
+                <strong>90%</strong>. This indicates that the model was able to
+                correctly classify 90% of the articles as either real or fake.
+              </Text>
             </CardContent>
           </Card>
 
-          <Card className="p-6 bg-gray-100 border border-gray-300 rounded-lg shadow-md text-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl">Content Engagement</CardTitle>
-            </CardHeader>
+          <Card className="hover:shadow-xl transition-shadow duration-300">
             <CardContent>
-              <CardDescription>
-                Articles on technology and community building receive the highest engagement, with users interacting in a variety of ways.
-              </CardDescription>
+              <CardTitle>Precision, Recall, and F1-Score</CardTitle>
+              <Text className="text-lg text-gray-700">
+                <strong>Precision</strong> for real news was around{" "}
+                <strong>0.91</strong>, and for fake news, it was{" "}
+                <strong>0.88</strong>.
+                <br />
+                <strong>Recall</strong> for real news was <strong>0.88</strong>,
+                and for fake news, it was <strong>0.91</strong>.
+                <br />
+                <strong>F1-Score</strong> was <strong>0.90</strong> for real
+                news and <strong>0.89</strong> for fake news.
+              </Text>
             </CardContent>
           </Card>
         </div>
       </section>
 
+      {/* Random Forest Section */}
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaCheckCircle className="inline-block text-green-500 mr-2" />
+          Random Forest Classifier
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-shadow duration-300">
+            <CardContent>
+              <CardTitle>Accuracy</CardTitle>
+              <Text className="text-lg text-gray-700">
+                The Random Forest model achieved a higher accuracy of
+                approximately <strong>94%</strong>, indicating better
+                performance.
+              </Text>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl transition-shadow duration-300">
+            <CardContent>
+              <CardTitle>Precision, Recall, and F1-Score</CardTitle>
+              <Text className="text-lg text-gray-700">
+                <strong>Precision</strong> for both real and fake news was{" "}
+                <strong>0.94</strong>.
+                <br />
+                <strong>Recall</strong> for real news was <strong>0.94</strong>,
+                and for fake news, it was <strong>0.93</strong>.
+                <br />
+                <strong>F1-Score</strong> was <strong>0.94</strong> for both
+                real and fake news.
+              </Text>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Confusion Matrix Section
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaChartBar className="inline-block text-blue-500 mr-2" />
+          Confusion Matrix and Classification Report
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="image-container">
+            <img
+              src="/path/to/naive-bayes-confusion-matrix.png"
+              alt="Naive Bayes Confusion Matrix"
+              className="rounded-lg shadow-xl"
+            />
+          </div>
+          <div className="image-container mt-6 sm:mt-0">
+            <img
+              src="/path/to/random-forest-confusion-matrix.png"
+              alt="Random Forest Confusion Matrix"
+              className="rounded-lg shadow-xl"
+            />
+          </div>
+        </div>
+      </section> */}
+
+      {/* Feature Importance Section */}
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaCogs className="inline-block text-yellow-500 mr-2" />
+          Feature Importance
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-shadow duration-300">
+            <CardContent>
+              <CardTitle>Key Features</CardTitle>
+              <Text className="text-lg text-gray-700">
+                The most important features in the Random Forest model were:
+                <ul className="list-disc ml-6 text-gray-700">
+                  <li>
+                    <strong>Title and Body Text</strong>: Combined title and
+                    body text was key for identifying real vs fake news.
+                  </li>
+                  <li>
+                    <strong>Body Length</strong>: Shorter bodies were often
+                    associated with fake news.
+                  </li>
+                </ul>
+              </Text>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Text Preprocessing Section */}
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaCogs className="inline-block text-yellow-500 mr-2" />
+          Text Preprocessing & Vectorization
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-shadow duration-300">
+            <CardContent>
+              <CardTitle>Count Vectorization vs. TF-IDF</CardTitle>
+              <Text className="text-lg text-gray-700">
+                TF-IDF vectorization was more effective than CountVectorizer,
+                as it highlighted important terms and reduced the weight of
+                common terms.
+              </Text>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl transition-shadow duration-300">
+            <CardContent>
+              <CardTitle>Stop Word Removal & Lemmatization</CardTitle>
+              <Text className="text-lg text-gray-700">
+                Removing stop words and applying lemmatization could further
+                improve model performance.
+              </Text>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Model Deployment Section */}
+      <section className="mb-16 bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-4xl font-semibold mb-6 text-gray-800">
+          <FaInfoCircle className="inline-block text-purple-500 mr-2" />
+          Model Deployment and User Interaction
+        </h2>
+        <Text className="text-lg text-gray-700">
+          The system provides real-time predictions with confidence scores for
+          users, allowing them to interact by liking, disliking, and providing
+          feedback on articles. This helps improve model accuracy over time.
+        </Text>
+      </section>
+
       {/* Footer Section */}
-      <footer className="text-center text-lg text-gray-600 mt-12">
-        <p>© 2024 Community Insights - All Rights Reserved</p>
+      <footer className="footer text-center mt-12">
+        <p className="text-lg text-gray-600">© 2024 - Model Performance Overview</p>
       </footer>
     </div>
   );
 };
 
-export default CommunityInsights;
+export default AccuracyProbability;
