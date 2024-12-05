@@ -32,7 +32,9 @@ function App() {
             {/* {isAuthenticated && <Sidebar />} */}
             <div className="flex-1 pl-3 pr-6">
               <Routes>
-                <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />
+              <Route path="/" element={<NoSign isAuthenticated={isAuthenticated} />} />
+
+                {/* <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} /> */}
                 <Route 
                   path="/home" 
                   element={isAuthenticated ? <Home /> : <Navigate to="/signin" />} 
