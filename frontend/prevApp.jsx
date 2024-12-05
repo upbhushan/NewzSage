@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RecoilRoot } from 'recoil';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
@@ -9,19 +9,17 @@ import Sidebar from './components/Sidebar';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import Content from './pages/Content';
-import NoSign from './pages/NoSign';
+// import Context from './components/Context';
 import './index.css';
-import { useAuthContext } from './context/AuthContext';
+import { authUser } from './context/AuthContext';
+import NoSign from './pages/NoSign';
 
 function App() {
-  const { authUser, isLoading } = useAuthContext();
+  const [isAuthenticated, setIsAuthenticated] = useState(true );
 
-  // If loading, render a fallback (optional, like a spinner)
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  const isAuthenticated = !!authUser; // Check if `authUser` exists to determine authentication status
+  const handleAuthentication = () => {
+    setIsAuthenticated(true);
+  };
 
   return (
     <RecoilRoot>
@@ -29,7 +27,7 @@ function App() {
         <div className="min-h-screen bg-gray-100 font-serif">
           {!isAuthenticated && <Header />}
           <div className="flex">
-            {isAuthenticated && <Sidebar />}
+            {isAuthenticated && <Sidebar /> }
             <div className="flex-1 pl-3 pr-6">
               <Routes>
                 <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />
@@ -41,10 +39,11 @@ function App() {
                   path="/submit" 
                   element={isAuthenticated ? <SubmitNews /> : <Navigate to="/signin" />} 
                 />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/content" element={<Content />} />
-                <Route path="/nosign" element={<NoSign />} />
+                <Route path="/signup" element={<SignUp onSignUp={handleAuthentication} />} />
+                <Route path="/signin" element={<SignIn onSignIn={handleAuthentication} />} />
+                <Route path='/content' element={<Content/>}/>
+                <Route path='/nosign' element={<NoSign/>}/>
+                {/* <Route path='/context' element={<Context/>}/> */}
               </Routes>
             </div>
           </div>
@@ -55,3 +54,4 @@ function App() {
 }
 
 export default App;
+
