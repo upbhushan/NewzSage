@@ -16,6 +16,7 @@ import AboutUs from './pages/AboutUs';
 import Contact from './pages/Contact';
 import FAQs from './pages/FAQs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import LocalVoice from './pages/LocalVoice';
 
 function App() {
   const { authUser, isLoading } = useAuthContext();
@@ -59,6 +60,7 @@ function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/faqs" element={<FAQs />} />
                   <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                  <Route path="/localvoice" element={<LocalVoice />} />
                   </Routes>
                 </div>
               </>
@@ -75,6 +77,8 @@ function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/faqs" element={<FAQs />} />
                   <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                  <Route path="/localvoice" element={<LocalVoice />} />
+
                 </Routes>
               </div>
             )}
