@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Request, Response } from "express";
 import cors from "cors";
 import user from "./routes/userRoute";
-import publisher from "./routes/publisherRoute";
+// import publisher from "./routes/publisherRoute";
 import news from "./routes/newsRoute";
 import comment from "./routes/commentRoute";
 import vote from "./routes/voteRoute";
@@ -18,7 +18,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/v1/user", user);
-app.use("/api/v1/publisher", publisher);
+// app.use("/api/v1/publisher", publisher);
 app.use("/api/v1/news", news);
 app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);

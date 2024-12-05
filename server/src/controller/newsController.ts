@@ -26,7 +26,7 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
   }
 
   const { title, content, genres, imageUrls, videoUrls } = validation.data;
-  const publisher_id = req.body.publisher_id; // Use publisher_id from middleware
+  // const publisher_id = req.body.publisher_id; // Use publisher_id from middleware
 
   try {
     // Check for duplicate news
@@ -43,7 +43,7 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
     const newNews = new News({
       title,
       content,
-      publisher_id: new mongoose.Types.ObjectId(publisher_id),
+      // publisher_id: new mongoose.Types.ObjectId(publisher_id),
       genres,
       imageUrls,
       videoUrls,

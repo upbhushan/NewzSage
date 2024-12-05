@@ -12,6 +12,7 @@ const createUserSchema = z.object({
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
+  government_id: z.string().optional(),
 });
 
 const signinUserSchema = z.object({
@@ -32,13 +33,21 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     return;
   }
 
-  const { username, email, password } = validation.data;
+  const { username, email, password, government_id } = validation.data;
 
   const existingUser = await User.findOne({ $or: [{ email }, { username }] });
 
   if (existingUser) {
     res.status(400).json({ error: "User already exists" });
     return;
+  }
+
+  if (government_id) {
+    const existingGovId = await User.findOne({ government_id });
+    if (existingGovId) {
+      res.status(400).json({ error: "Government ID already in use" });
+      return;
+    }
   }
 
   try {
@@ -48,19 +57,23 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       username,
       email,
       password_hash,
+      isPublisher: !!government_id,
+      government_id: government_id || undefined,
     });
 
     await newUser.save();
 
-    const token = jwt.sign({ user_id: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign(
+      { user_id: newUser._id, isPublisher: newUser.isPublisher },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    // Send the user_id and token in the response
     res.status(201).json({ user_id: newUser._id, token });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 };
-
 export const signinUser = async (req: Request, res: Response): Promise<void> => {
   const validation = signinUserSchema.safeParse(req.body);
 

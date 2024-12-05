@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { createNews } from '../controller/newsController';
-import { publisherMiddleware } from '../middlewares/publishmiddleware';
+import { checkPublisherRole } from '../middlewares/checkpublisherRole';
 import { authMiddleware } from '../middlewares/authmiddleware';
 
 const router = Router();
 
-router.post('/post',publisherMiddleware, createNews);
+router.post('/post',checkPublisherRole, createNews);
 
 export default router;

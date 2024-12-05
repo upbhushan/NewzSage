@@ -9,7 +9,7 @@ interface INews extends Document {
   imageUrls?: string[];
   videoUrls?: string[];
   real_probability?: number;
-  publisher_id: mongoose.Schema.Types.ObjectId;
+  // publisher_id: mongoose.Schema.Types.ObjectId;
   comments: mongoose.Schema.Types.ObjectId[];
   votes: mongoose.Schema.Types.ObjectId[];
   upvote_count: number;
@@ -26,7 +26,7 @@ const NewsSchema: Schema = new Schema(
     imageUrls: [{ type: String , required:false}], // Optional, defaults to an empty array
     videoUrls: [{ type: String , required:false}], // Optional, defaults to an empty array
     real_probability: { type: Number },
-    publisher_id: { type: Schema.Types.ObjectId, ref: 'Publisher', required: true },
+    // publisher_id: { type: Schema.Types.ObjectId, ref: 'Publisher', required: true },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     votes: [{ type: Schema.Types.ObjectId, ref: 'Vote' }],
     upvote_count: { type: Number, default: 0 },
