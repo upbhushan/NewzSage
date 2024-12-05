@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import Content from './pages/Content';
+// import Context from './components/Context';
 import './index.css';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/signup" element={<SignUp onSignUp={handleAuthentication} />} />
                 <Route path="/signin" element={<SignIn onSignIn={handleAuthentication} />} />
                 <Route path='/content' element={<Content/>}/>
+                {/* <Route path='/context' element={<Context/>}/> */}
               </Routes>
             </div>
           </div>
