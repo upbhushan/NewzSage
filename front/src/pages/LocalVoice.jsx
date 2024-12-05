@@ -5,6 +5,7 @@ import { PenTool, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "@/context/AuthContext"; // Assuming you have this for authentication context
+import cors from 'cors';
 
 export default function LocalVoice() {
   const { authUser } = useAuthContext();
@@ -14,9 +15,9 @@ export default function LocalVoice() {
   const [article, setArticle] = useState({
     title: '',
     content: '',
-    categories: [''],
-    images: [], // Start with an empty array for images
-    videos: [], // Start with an empty array for videos
+    genres: [''],
+    imageUrls: [], // Start with an empty array for images
+    videoUrls: [], // Start with an empty array for videos
   });
 
   // Function to handle input changes for dynamic fields
@@ -78,72 +79,52 @@ export default function LocalVoice() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Validate the form data
-    if (!article.title || !article.content) {
-      console.error('Title and Content are required.');
-      return;
-    }
-  
-    // if (article.images.length === 0) {
-    //   console.error('At least one image URL is required.');
-    //   return;
-    // }
-  
-    // if (article.videos.length === 0) {
-    //   console.error('At least one video URL is required.');
-    //   return;
-    // }
-  
-    // if (article.categories.length === 0) {
-    //   console.error('At least one category is required.');
-    //   return;
-    // }
-  
-    // Prepare formData to send
-    const formData = new FormData();
-    formData.append('title', article.title);
-    formData.append('content', article.content);
-  
-    // Convert arrays to comma-separated strings for submission
-    formData.append('categories', article.categories.join(',')); // Categories as a comma-separated string
-    formData.append('images', article.images.join(',')); // Images as a comma-separated string
-    formData.append('videos', article.videos.join(',')); // Videos as a comma-separated string
-  
-    // Add token from localStorage
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No authentication token found.');
-      return;
-    }
-  
-    try {
-      const response = await fetch('http://localhost:3000/api/v1/news/post', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error submitting article:', errorData);
-        return;
-      }
-  
-      const responseData = await response.json();
-      console.log('Article Submitted:', responseData);
-  
-      // Redirect after successful submission
-      navigate('/');
-    } catch (error) {
-      console.error('Error:', error);
-    }
+  // Validate formData before sending
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  // Ensure content is a string
+  const title = Array.isArray(article.title) ? article.title.join(' ') : article.title;
+  const content = Array.isArray(article.content) ? article.content.join(' ') : article.content;
+
+  // Prepare the payload
+  const payload = {
+    title: title || '',
+    content: content || '',
+    imageUrls: article.imageUrls.map(image => image.base64) || [],
+    videoUrls: article.videoUrls.map(video => video.base64) || [],
   };
-  
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('No authentication token found.');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/news/post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log('Response:', response);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error submitting article:', JSON.stringify(errorData, null, 2));
+      return;
+    }
+
+    const responseData = await response.json();
+    console.log('Article Submitted:', responseData);
+    navigate('/');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
   
   
   const handleNavigateToSignUp = () => {
@@ -195,7 +176,7 @@ export default function LocalVoice() {
                   {/* Dynamic Category Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Categories</label>
-                    {article.categories.map((category, index) => (
+                    {article.genres.map((category, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="text"
@@ -205,7 +186,7 @@ export default function LocalVoice() {
                           className="w-full p-3 border rounded-md"
                           placeholder="Enter category"
                         />
-                        {article.categories.length > 1 && (
+                        {article.genres.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('categories', index)}
@@ -230,7 +211,7 @@ export default function LocalVoice() {
                   {/* Dynamic Image Upload Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Images</label>
-                    {article.images.map((image, index) => (
+                    {article.imageUrls.map((image, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="file"
@@ -238,7 +219,7 @@ export default function LocalVoice() {
                           onChange={(e) => handleFileChange(e, index, 'images')}
                           className="w-full p-3 border rounded-md"
                         />
-                        {article.images.length > 1 && (
+                        {article.imageUrls.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('images', index)}
@@ -263,7 +244,7 @@ export default function LocalVoice() {
                   {/* Dynamic Video Upload Fields */}
                   <div>
                     <label className="block text-sm font-medium mb-2">Videos</label>
-                    {article.videos.map((video, index) => (
+                    {article.videoUrls.map((video, index) => (
                       <div key={index} className="mb-3 flex items-center space-x-2">
                         <input
                           type="file"
@@ -271,7 +252,7 @@ export default function LocalVoice() {
                           onChange={(e) => handleFileChange(e, index, 'videos')}
                           className="w-full p-3 border rounded-md"
                         />
-                        {article.videos.length > 1 && (
+                        {article.videoUrls.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeInputField('videos', index)}
