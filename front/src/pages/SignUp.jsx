@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext'; // Importing the Auth Context
 
 export default function SignUp() {
+  const { refreshAuthUser } = useAuthContext();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -57,6 +58,8 @@ export default function SignUp() {
       if (response.ok) {
         // Save token to localStorage and set authUser in context
         localStorage.setItem('token', data.token);
+
+        refreshAuthUser();
         
         // Decode the token to extract user information
         const decodedToken = jwtDecode(data.token);
