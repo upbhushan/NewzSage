@@ -12,6 +12,10 @@ import Content from './pages/Content';
 import NoSign from './pages/NoSign';
 import './index.css';
 import { useAuthContext } from './context/AuthContext';
+import AboutUs from './pages/AboutUs';
+import Contact from './pages/Contact';
+import FAQs from './pages/FAQs';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   const { authUser, isLoading } = useAuthContext();
@@ -51,6 +55,10 @@ function App() {
                       path="/content"
                       element={isAuthenticated ? <Content /> : <Navigate to="/" />}
                     />
+                    <Route path="/about" element={<AboutUs />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/faqs" element={<FAQs />} />
+                  <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                   </Routes>
                 </div>
               </>
@@ -63,6 +71,10 @@ function App() {
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/signin" element={<SignIn />} />
                   <Route path="/landingpage" element={isAuthenticated ? <LandingPage /> : <Navigate to="/" />} />
+                  <Route path="/about" element={<AboutUs />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/faqs" element={<FAQs />} />
+                  <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                 </Routes>
               </div>
             )}
