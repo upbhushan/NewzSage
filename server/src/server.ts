@@ -10,6 +10,7 @@ import comment from "./routes/commentRoute";
 import vote from "./routes/voteRoute";
 import connectDB from './db';
 import allNews from "./routes/getallnews";
+import auth from "./routes/auth";
 
 const app = express();
 connectDB();
@@ -25,6 +26,7 @@ app.use(cors({
 
 // Routes
 app.use("/api/v1/user", user);
+app.use("/api/v1/details", auth);
 // app.use("/api/v1/publisher", publisher);
 app.use("/api/v1/all", allNews);
 app.use("/api/v1/news", news);
@@ -35,5 +37,3 @@ app.use("/api/v1/vote", vote);
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
-
-
