@@ -43,8 +43,8 @@ function Sidebar() {
             <h4 className="text-xl font-bold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/about" className="hover:underline">About Us</Link></li>
-              <li><Link to="/faq" className="hover:underline">FAQs</Link></li>
-              <li><Link to="/privacy" className="hover:underline">Privacy Policy</Link></li>
+              <li><Link to="/faqs" className="hover:underline">FAQs</Link></li>
+              <li><Link to="/privacypolicy" className="hover:underline">Privacy Policy</Link></li>
               <li><Link to="/contact" className="hover:underline">Contact</Link></li>
             </ul>
       </div>
