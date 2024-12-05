@@ -27,9 +27,9 @@ function App() {
     <RecoilRoot>
       <Router>
         <div className="min-h-screen bg-gray-100 font-serif">
-          {!isAuthenticated && <Header />}
+          {/* {!isAuthenticated && <Header />} */}
           <div className="flex">
-            {isAuthenticated && <Sidebar />}
+            {/* {isAuthenticated && <Sidebar />} */}
             <div className="flex-1 pl-3 pr-6">
               <Routes>
                 <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />

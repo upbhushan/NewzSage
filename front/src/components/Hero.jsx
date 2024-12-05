@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <main className="flex-grow container mx-auto py-12 px-4 flex flex-col md:flex-row items-stretch justify-between">
       <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-center">
-        <h1 className="text-6xl font-bold mb-4 font-serif">newzsage</h1>
+        <h1 className="text-6xl font-bold mb-4 font-serif">Newzsage</h1>
         <h2 className="text-3xl font-semibold mb-6 font-serif">THE VOICE</h2>
         <p className="text-xl mb-8">Stay informed with the latest news and stories from around the world.</p>
       </div>
