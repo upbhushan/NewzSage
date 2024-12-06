@@ -122,6 +122,7 @@ export function useNews() {
         const newUniqueNews = fetchedNews
           .map(item => ({
             id: item._id || `news-${Math.random().toString(36).substr(2, 9)}`,
+            probability:item.real_probability,
             title: item.title || "Untitled",
             description: item.content || "No description available",
             media: [...item.imageUrls, ...item.videoUrls],

@@ -138,6 +138,13 @@ export default function NewsCard({ news }) {
               ? `${news.description.substring(0, 200)}...`
               : news.description}
           </p>
+          <div className="mt-4">
+        <span className="text-gray-600">Real Probability: </span>
+        <span className="font-semibold">
+  {news.probability !== undefined ? `${(news.probability * 100).toFixed(2)}%` : 'N/A'}
+</span>
+
+      </div>
 
           {/* Interaction Buttons */}
           <div className="flex items-center space-x-2 text-gray-400">
@@ -216,8 +223,10 @@ export default function NewsCard({ news }) {
               <CarouselNext />
             </Carousel>
           </div>
+          
         )}
       </div>
+      
     </div>
   );
 }
