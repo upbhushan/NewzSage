@@ -87,30 +87,14 @@ export default function LocalVoice() {
       return;
     }
   
-    // if (article.images.length === 0) {
-    //   console.error('At least one image URL is required.');
-    //   return;
-    // }
-  
-    // if (article.videos.length === 0) {
-    //   console.error('At least one video URL is required.');
-    //   return;
-    // }
-  
-    // if (article.categories.length === 0) {
-    //   console.error('At least one category is required.');
-    //   return;
-    // }
-  
-    // Prepare formData to send
-    const formData = new FormData();
-    formData.append('title', article.title);
-    formData.append('content', article.content);
-  
-    // Convert arrays to comma-separated strings for submission
-    formData.append('categories', article.categories.join(',')); // Categories as a comma-separated string
-    formData.append('images', article.images.join(',')); // Images as a comma-separated string
-    formData.append('videos', article.videos.join(',')); // Videos as a comma-separated string
+    // Prepare the payload
+    const payload = {
+      title: article.title,
+      content: article.content,
+      categories: article.categories.filter(category => category !== ''), // Remove empty categories
+      imageUrls: article.images,
+      videoUrls: article.videos,
+    };
   
     // Add token from localStorage
     const token = localStorage.getItem('token');
@@ -123,9 +107,10 @@ export default function LocalVoice() {
       const response = await fetch('http://localhost:3000/api/v1/news/post', {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: JSON.stringify(payload),
       });
   
       if (!response.ok) {
@@ -143,8 +128,6 @@ export default function LocalVoice() {
       console.error('Error:', error);
     }
   };
-  
-  
   
   const handleNavigateToSignUp = () => {
     navigate('/signup'); // Adjust path based on your routes
@@ -174,7 +157,7 @@ export default function LocalVoice() {
                       type="text"
                       name="title"
                       value={article.title}
-                      onChange={(e) => handleInputChange(e, 0, 'title')}
+                      onChange={(e) => setArticle({ ...article, title: e.target.value })}
                       className="w-full p-3 border rounded-md"
                       placeholder="Enter article title"
                     />
@@ -185,7 +168,7 @@ export default function LocalVoice() {
                     <textarea
                       name="content"
                       value={article.content}
-                      onChange={(e) => handleInputChange(e, 0, 'content')}
+                      onChange={(e) => setArticle({ ...article, content: e.target.value })}
                       className="w-full p-3 border rounded-md"
                       placeholder="Write your article content here"
                       rows={6}

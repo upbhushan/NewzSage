@@ -38,10 +38,11 @@ export const createNews = async (req: AuthRequest, res: Response, next: NextFunc
     avatar_id: req.user.avatar_id, // Automatically set avatar_id (adjust logic if different field is used)
     created_at: new Date(), // Automatically set created_at
   });
-
+  
   console.log("Validation result:", validation); // Debug log
 
   if (!validation.success) {
+    console.error("Validation errors:", validation.error.errors); // Log detailed validation errors
     res.status(400).json({
       errors: validation.error.errors.map((err) => ({
         path: err.path,
