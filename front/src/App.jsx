@@ -56,7 +56,7 @@ function App() {
                       element={isAuthenticated ? <SubmitNews /> : <Navigate to="/" />}
                     />
                     <Route
-                      path="/content"
+                      path="/content/:id"
                       element={isAuthenticated ? <Content /> : <Navigate to="/" />}
                     />
                     <Route path="/about" element={<AboutUs />} />

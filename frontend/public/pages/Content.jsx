@@ -12,22 +12,9 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import React, { useEffect} from 'react';
-import { useParams } from 'react-router-dom';  // assuming you're using react-router for routing
-import { useNews } from '../hooks/useNews';  // import the custom hook
-
 
 export default function Content() {
-    const { id } = useParams(); // Get the news ID from the URL
-    const { news, loading, error } = useNews(); // Fetch news using the custom hook
-    const [matchedNews, setMatchedNews] = useState(null); // State to hold the matched news
-  
     const [zoomedImage, setZoomedImage] = useState(null);
-    useEffect(() => {
-    // Match the news by the ID from the URL
-    const newsItem = news.find(item => item.id === id);
-    setMatchedNews(newsItem); // Set the matched news in the state
-  }, [id, news]); 
 
     const newsData = {
         id: "1",
