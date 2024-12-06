@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios"; // Make sure axios is installed
 import { Button } from "@/components/ui/button";
 import { BiUpvote } from "react-icons/bi";
 import { BiDownvote } from "react-icons/bi";
@@ -12,62 +14,31 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import React, { useEffect} from 'react';
-import { useParams } from 'react-router-dom';  // assuming you're using react-router for routing
-import { useNews } from '../hooks/useNews';  // import the custom hook
-
 
 export default function Content() {
-    const { id } = useParams(); // Get the news ID from the URL
-    const { news, loading, error } = useNews(); // Fetch news using the custom hook
-    const [matchedNews, setMatchedNews] = useState(null); // State to hold the matched news
-  
-    const [zoomedImage, setZoomedImage] = useState(null);
-    useEffect(() => {
-    // Match the news by the ID from the URL
-    const newsItem = news.find(item => item.id === id);
-    setMatchedNews(newsItem); // Set the matched news in the state
-  }, [id, news]); 
-
-    const newsData = {
-        id: "1",
-        title: "Breaking News: React is Awesome!",
-        description:
-            "React has revolutionized the way developers build modern web applications. Its component-based architecture and declarative syntax make it a popular choice for creating dynamic, interactive UIs. In this article, we explore why React continues to be a leader in the web development space.",
-        media: [
-            { type: "image", url: "https://picsum.photos/id/237/200/300" },
-            { type: "image", url: "https://picsum.photos/seed/picsum/200/300" },
-            { type: "image", url: "https://picsum.photos/200/300/?blur" },
-            { type: "video", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
-        ],
-        upvotes: 123,
-        downvotes: 45,
-        publisher: {
-            name: "TechNews Daily",
-            date: "2024-12-01",
-            logoUrl: "https://picsum.photos/id/237/200/300", // Add publisher logo if available
-        },
-    };
-
-    const initialComments = [
-        {
-            text: "This is amazing news!",
-            author: "Alice",
-            date: "2024-12-03T10:15:00Z",
-        },
-        {
-            text: "I couldn't agree more.",
-            author: "Bob",
-            date: "2024-12-03T12:30:00Z",
-        },
-    ];
-
-    const [votes, setVotes] = useState({
-        upvotes: newsData.upvotes,
-        downvotes: newsData.downvotes,
-    });
-    const [comments, setComments] = useState(initialComments);
+    const { id } = useParams(); // Get the ID from the URL
+    const [newsData, setNewsData] = useState(null);
+    const [votes, setVotes] = useState({ upvotes: 0, downvotes: 0 });
+    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
+    const [zoomedImage, setZoomedImage] = useState(null);
+
+    useEffect(() => {
+        // Fetch the news data based on the ID from the URL
+        axios
+            .get(`http://localhost:3000/api/v1/all/news/${id}`) // Replace with your actual API URL
+            .then((response) => {
+                setNewsData(response.data);
+                setVotes({
+                    upvotes: response.data.upvote_count,
+                    downvotes: response.data.downvote_count,
+                });
+                setComments(response.data.comments || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching news data:", error);
+            });
+    }, [id]);
 
     const handleVote = (type) => {
         setVotes((prev) => ({
@@ -90,7 +61,7 @@ export default function Content() {
             navigator
                 .share({
                     title: newsData.title,
-                    text: newsData.description,
+                    text: newsData.content,
                     url: currentUrl,
                 })
                 .catch((error) => console.log("Error sharing:", error));
@@ -124,6 +95,10 @@ export default function Content() {
         window.history.back(); // Go back to the previous page
     };
 
+    if (!newsData) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto bg-white shadow rounded-lg p-6">
@@ -133,16 +108,9 @@ export default function Content() {
                         <IoArrowBackOutline className="text-2xl" />
                     </button>
                     <div className="flex items-center space-x-2">
-                        {newsData.publisher.logoUrl && (
-                            <img
-                                src={newsData.publisher.logoUrl}
-                                alt="Publisher Logo"
-                                className="w-10 h-10 rounded-full"
-                            />
-                        )}
                         <div className="text-sm text-gray-600">
-                            <span className="font-semibold">{newsData.publisher.name}</span> -{" "}
-                            <span>{new Date(newsData.publisher.date).toLocaleDateString()}</span>
+                            <span className="font-semibold">{newsData.author}</span> -{" "}
+                            <span>{new Date(newsData.created_at).toLocaleDateString()}</span>
                         </div>
                     </div>
                 </div>
@@ -150,34 +118,35 @@ export default function Content() {
                 <h1 className="text-3xl font-bold mb-4">{newsData.title}</h1>
 
                 {/* Carousel for Images/Videos */}
-                {newsData.media && newsData.media.length > 0 && (
+                {(newsData.imageUrls.length > 0 || newsData.videoUrls.length > 0) && (
                     <Carousel>
                         <CarouselContent>
-                            {newsData.media.map((item, index) => (
+                            {newsData.imageUrls.map((url, index) => (
                                 <CarouselItem key={index} className="flex justify-center items-center bg-gray-300 rounded-md">
-                                    {item.type === "image" ? (
-                                        <img
-                                            src={item.url}
-                                            alt={`Media ${index + 1}`}
-                                            className="max-h-[500px] max-w-full object-contain rounded-md cursor-zoom-in"
-                                            style={{
-                                                height: "500px",
-                                                width: "auto",
-                                            }}
-                                            onClick={() => handleZoom(item.url)}
-                                        />
-                                    ) : item.type === "video" ? (
-                                        <video
-                                            controls
-                                            className="rounded-md cursor-pointer"
-                                            style={{
-                                                height: "500px",
-                                                width: "1200px",
-                                                objectFit: "contain",
-                                            }}
-                                            src={item.url}
-                                        />
-                                    ) : null}
+                                    <img
+                                        src={url}
+                                        alt={`Image ${index + 1}`}
+                                        className="max-h-[500px] max-w-full object-contain rounded-md cursor-zoom-in"
+                                        style={{
+                                            height: "500px",
+                                            width: "auto",
+                                        }}
+                                        onClick={() => handleZoom(url)}
+                                    />
+                                </CarouselItem>
+                            ))}
+                            {newsData.videoUrls.map((url, index) => (
+                                <CarouselItem key={index} className="flex justify-center items-center bg-gray-300 rounded-md">
+                                    <video
+                                        controls
+                                        className="rounded-md cursor-pointer"
+                                        style={{
+                                            height: "500px",
+                                            width: "1200px",
+                                            objectFit: "contain",
+                                        }}
+                                        src={url}
+                                    />
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
@@ -187,7 +156,7 @@ export default function Content() {
                 )}
 
                 <div className="mt-6">
-                    <p className="text-gray-700 leading-relaxed">{newsData.description}</p>
+                    <p className="text-gray-700 leading-relaxed">{newsData.content}</p>
                 </div>
 
                 <div className="flex items-center space-x-4 my-6 justify-start">
@@ -238,24 +207,23 @@ export default function Content() {
                         {comments.map((comment, index) => (
                             <li key={index} className="p-4 bg-gray-100 rounded-lg shadow-md">
                                 <p className="text-gray-800">{comment.text}</p>
-                                <span className="text-sm text-gray-500">
-                                    — {comment.author}, {new Date(comment.date).toLocaleString()}
-                                </span>
+                                <span className="text-sm text-gray-500">— {comment.author}, {new Date(comment.date).toLocaleString()}</span>
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
 
+            {/* Modal for Image Zoom */}
             {zoomedImage && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
                     onClick={closeZoom}
                 >
                     <img
                         src={zoomedImage}
-                        alt="Zoomed"
-                        className="max-w-[90%] max-h-[90%] cursor-zoom-out"
+                        alt="Zoomed Image"
+                        className="max-w-full max-h-full object-contain"
                     />
                 </div>
             )}
