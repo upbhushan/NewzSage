@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BiUpvote, BiDownvote } from 'react-icons/bi';
 import { FaRegComment } from 'react-icons/fa';
 import { PiShareFatLight } from 'react-icons/pi';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import {
   Carousel,
   CarouselContent,
@@ -139,10 +140,17 @@ export default function NewsCard({ news }) {
               : news.description}
           </p>
           <div className="mt-4">
-        <span className="text-gray-600">Real Probability: </span>
-        <span className="font-semibold">
-  {news.probability !== undefined ? `${(news.probability * 100).toFixed(2)}%` : 'N/A'}
-</span>
+          <div className="flex items-center">
+      <span className="text-gray-600">Real Probability: </span>
+      <span className="font-semibold mr-2">
+        {news.probability !== undefined ? `${(news.probability * 100).toFixed(2)}%` : 'N/A'}
+      </span>
+      {news.probability !== undefined && (
+        news.probability > 0.4 ? 
+        <FaCheckCircle className="text-black" /> : 
+        <FaTimesCircle className="text-black" />
+      )}
+    </div>
 
       </div>
 
