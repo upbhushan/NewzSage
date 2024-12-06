@@ -11,7 +11,7 @@ import vote from "./routes/voteRoute";
 import connectDB from './db';
 import allNews from "./routes/getallnews";
 import auth from "./routes/auth";
-import userInfoRoute from "./routes/userInfoRoute";
+// import userInfoRoute from "./routes/userInfoRoute";
 
 const app = express();
 connectDB();
@@ -26,7 +26,7 @@ app.use(cors({
 
 
 // Routes
-app.use('/api/v1/userInfo', userInfoRoute);
+// app.use('/api/v1/userInfo', userInfoRoute);
 app.use("/api/v1/user", user);
 app.use("/api/v1/details", auth);
 // app.use("/api/v1/publisher", publisher);
