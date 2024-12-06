@@ -14,8 +14,11 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useAuthContext } from "../context/AuthContext";
 
 export default function Content() {
+    const { authUser } = useAuthContext();  // Destructure setAuthUser from context
+
     const { id } = useParams(); // Get the ID from the URL
     const [newsData, setNewsData] = useState(null);
     const [votes, setVotes] = useState({ upvotes: 0, downvotes: 0 });
@@ -24,7 +27,8 @@ export default function Content() {
     const [zoomedImage, setZoomedImage] = useState(null);
 
     useEffect(() => {
-        // Fetch the news data based on the ID from the URL
+        console.log(authUser)
+        // Fetch the news data and comments based on the ID from the URL
         axios
             .get(`http://localhost:3000/api/v1/all/news/${id}`) // Replace with your actual API URL
             .then((response) => {
@@ -33,12 +37,39 @@ export default function Content() {
                     upvotes: response.data.upvote_count,
                     downvotes: response.data.downvote_count,
                 });
-                setComments(response.data.comments || []);
             })
             .catch((error) => {
                 console.error("Error fetching news data:", error);
             });
+
+        // Fetch comments for the news
+        axios
+            .get(`http://localhost:3000/api/v1/comment/comments/${id}`) // Adjust endpoint as needed
+            .then((response) => {
+                setComments(response.data); // Store comments as objects
+            })
+            .catch((error) => {
+                console.error("Error fetching comments:", error);
+            });
     }, [id]);
+
+
+    // useEffect(() => {
+    //     // Fetch the news data based on the ID from the URL
+    //     axios
+    //         .get(`http://localhost:3000/api/v1/all/news/${id}`) // Replace with your actual API URL
+    //         .then((response) => {
+    //             setNewsData(response.data);
+    //             setVotes({
+    //                 upvotes: response.data.upvote_count,
+    //                 downvotes: response.data.downvote_count,
+    //             });
+    //             setComments(response.data.comments || []);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching news data:", error);
+    //         });
+    // }, [id]);
 
     const handleVote = (type) => {
         setVotes((prev) => ({
@@ -78,18 +109,41 @@ export default function Content() {
             alert("Comment cannot be empty.");
             return;
         }
-
-        const newCommentObject = {
-            text: newComment,
-            author: "You",
-            date: new Date().toISOString(),
+    
+        const user_id = authUser.id; // Replace this with actual logic to fetch logged-in user ID
+    
+        const commentData = {
+            news_id: id,  // Using news_id from the URL params
+            user_id: user_id,  // Use the user ID from the authentication logic
+            content: newComment,  // The content of the new comment
         };
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        setComments((prev) => [...prev, newCommentObject]);
-        setNewComment("");
+    
+        try {
+            // Retrieve the Bearer token from localStorage
+            const token = localStorage.getItem("token"); // Make sure token is saved under 'token' key
+    
+            // Set up the Authorization header with the Bearer token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+    
+            // Send the new comment to the backend with the Authorization header
+            const response = await axios.post("http://localhost:3000/api/v1/comment", commentData, config);
+    
+            // If the comment is successfully created, add it to the comments state
+            setComments((prev) => [...prev, response.data]);
+    
+            // Clear the comment input
+            setNewComment("");
+        } catch (error) {
+            console.error("Error posting comment:", error);
+            alert("Failed to post comment.");
+        }
     };
+    
+    
 
     const handleGoBack = () => {
         window.history.back(); // Go back to the previous page
@@ -204,13 +258,15 @@ export default function Content() {
                     </div>
 
                     <ul className="space-y-4">
-                        {comments.map((comment, index) => (
-                            <li key={index} className="p-4 bg-gray-100 rounded-lg shadow-md">
-                                <p className="text-gray-800">{comment.text}</p>
-                                <span className="text-sm text-gray-500">— {comment.author}, {new Date(comment.date).toLocaleString()}</span>
-                            </li>
-                        ))}
-                    </ul>
+    {comments.map((comment) => (
+        <li key={comment._id} className="p-4 bg-gray-100 rounded-lg shadow-md">
+            <p className="text-gray-800">{comment.content}</p>
+            <span className="text-sm text-gray-500">
+                — {comment.user_id}, {new Date(comment.created_at).toLocaleString()}
+            </span>
+        </li>
+    ))}
+</ul>
                 </div>
             </div>
 
