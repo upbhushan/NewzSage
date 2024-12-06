@@ -20,6 +20,7 @@ import LocalVoice from './pages/LocalVoice';
 import StaticVoice from './pages/StaticVoice';
 import AccuracyProbability from './pages/AccuracyProbability';
 import CommunityInsights from './pages/CommunityInsights';
+import Account from './pages/Account';
 
 function App() {
   const { authUser, isLoading } = useAuthContext();
@@ -67,6 +68,7 @@ function App() {
                   <Route path="/staticvoice" element={<StaticVoice/>} />
                   <Route path="/accuracyprobability" element={<AccuracyProbability/>} />
                   <Route path="/communityInsights" element={<CommunityInsights/>} />
+                  <Route path="/account" element={<Account/>} />
 
                   </Routes>
                 </div>

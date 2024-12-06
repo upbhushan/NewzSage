@@ -17,7 +17,7 @@ function Sidebar() {
               </Link>
             </li>
             <li>
-              <Link to="/home" className="flex items-center hover:underline">
+              <Link to="/" className="flex items-center hover:underline">
                 <Edit className="w-5 h-5 mr-2" />
                 Community News
               </Link>
