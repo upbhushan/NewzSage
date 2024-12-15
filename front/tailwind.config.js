@@ -1,3 +1,6 @@
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 /** @type {import('tailwindcss').Config} */
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
