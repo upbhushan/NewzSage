@@ -1,12 +1,13 @@
 "use strict";
-// routes/votes.ts
+// routes/auth.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const voteController_1 = require("../controller/voteController");
-const authmiddleware_1 = require("../middlewares/authmiddleware");
+const authController_1 = require("../controller/authController");
+const authmiddleware_1 = require("../middlewares/authmiddleware"); // Middleware to verify JWT
 const router = express_1.default.Router();
-router.post('/change', authmiddleware_1.authMiddleware, voteController_1.handleVote);
+// Protected route to get user info
+router.get('/user', authmiddleware_1.authMiddleware, authController_1.getUserInfo);
 exports.default = router;

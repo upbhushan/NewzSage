@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const commentController_1 = require("../controller/commentController");
 const authmiddleware_1 = require("../middlewares/authmiddleware");
+const getCommentsByNewsId_1 = require("../controller/getCommentsByNewsId");
 const router = (0, express_1.Router)();
 router.post('/', authmiddleware_1.authMiddleware, commentController_1.createComment);
+router.get('/comments/:news_id', getCommentsByNewsId_1.getCommentsByNewsId);
 exports.default = router;

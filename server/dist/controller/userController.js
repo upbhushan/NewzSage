@@ -24,6 +24,7 @@ const createUserSchema = zod_1.z.object({
     username: zod_1.z.string().min(1, "Username is required"),
     email: zod_1.z.string().email("Invalid email format"),
     password: zod_1.z.string().min(6, "Password must be at least 6 characters long"),
+    government_id: zod_1.z.string().optional(),
 });
 const signinUserSchema = zod_1.z.object({
     email: zod_1.z.string().email("Invalid email format"),
@@ -40,22 +41,38 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
         return;
     }
-    const { username, email, password } = validation.data;
+    const { username, email, password, government_id } = validation.data;
     const existingUser = yield User_1.default.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
         res.status(400).json({ error: "User already exists" });
         return;
     }
+    if (government_id) {
+        const existingGovId = yield User_1.default.findOne({ government_id });
+        if (existingGovId) {
+            res.status(400).json({ error: "Government ID already in use" });
+            return;
+        }
+    }
     try {
         const password_hash = yield bcrypt_1.default.hash(password, SALT_ROUNDS);
+        const avatar_id = Math.floor(Math.random() * 10) + 1; // Assign a number between 1 to 10
         const newUser = new User_1.default({
             username,
+            avatar_id,
             email,
             password_hash,
+            isPublisher: !!government_id,
+            government_id: government_id || undefined,
         });
         yield newUser.save();
-        const token = jsonwebtoken_1.default.sign({ user_id: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
-        res.status(201).json({ newUser, token });
+        const token = jsonwebtoken_1.default.sign({ user_id: newUser._id,
+            username: newUser.username,
+            isPublisher: newUser.isPublisher,
+            author: newUser.username,
+            avatar_id: newUser.avatar_id,
+            created_at: newUser.created_at, }, JWT_SECRET, { expiresIn: "1d" });
+        res.status(201).json({ user_id: newUser._id, token });
     }
     catch (error) {
         res.status(500).json({ error: error.message });

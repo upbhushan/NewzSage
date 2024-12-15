@@ -1,4 +1,5 @@
 "use strict";
+// controllers/voteController.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,37 +13,66 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createVote = void 0;
-const zod_1 = require("zod");
-const Vote_1 = __importDefault(require("../models/Vote")); // Assuming a Mongoose Vote model is defined in `models/Vote`
-const createVoteSchema = zod_1.z.object({
-    news_id: zod_1.z.string({ invalid_type_error: "Invalid news ID format" }),
-    user_id: zod_1.z.string({ invalid_type_error: "Invalid user ID format" }),
-    vote_type: zod_1.z.enum(['upvote', 'downvote']),
-});
-const createVote = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const validation = createVoteSchema.safeParse(req.body);
-    if (!validation.success) {
-        res.status(400).json({
-            errors: validation.error.errors.map((err) => ({
-                path: err.path,
-                message: err.message,
-            })),
-        });
+exports.handleVote = void 0;
+const Vote_1 = __importDefault(require("../models/Vote"));
+const News_1 = __importDefault(require("../models/News"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const handleVote = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { news_id, user_id, vote_type } = req.body;
+    // Validate ObjectIds
+    if (!mongoose_1.default.Types.ObjectId.isValid(news_id) ||
+        !mongoose_1.default.Types.ObjectId.isValid(user_id)) {
+        res.status(400).json({ message: 'Invalid news_id or user_id' });
         return;
     }
-    const { news_id, user_id, vote_type } = validation.data;
     try {
-        const newVote = new Vote_1.default({
-            news_id,
-            user_id,
-            vote_type,
-        });
+        // Find existing vote by user on the news item
+        const existingVote = yield Vote_1.default.findOne({ news_id, user_id });
+        if (existingVote) {
+            if (existingVote.vote_type === vote_type) {
+                // // User is attempting to remove their vote (unvote)
+                // await Vote.deleteOne({ _id: existingVote._id });
+                // // Decrement the appropriate vote count
+                // const decrementField = vote_type === 'upvote' ? 'upvote_count' : 'downvote_count';
+                // await News.findByIdAndUpdate(news_id, { $inc: { [decrementField]: -1 } });
+                res.status(200).json({ message: "no chnage in vote" });
+                return;
+            }
+            else {
+                // User is changing their vote type
+                const oldVoteType = existingVote.vote_type;
+                existingVote.vote_type = vote_type;
+                yield existingVote.save();
+                // Increment the new vote type count and decrement the old vote type count
+                const incrementField = vote_type === 'upvote' ? 'upvote_count' : 'downvote_count';
+                const decrementField = oldVoteType === 'upvote' ? 'upvote_count' : 'downvote_count';
+                yield News_1.default.findByIdAndUpdate(news_id, {
+                    $inc: {
+                        [incrementField]: 1,
+                        [decrementField]: -1,
+                    },
+                });
+                // Retrieve updated vote counts
+                const upvote_count = yield Vote_1.default.countDocuments({ news_id, vote_type: 'upvote' });
+                const downvote_count = yield Vote_1.default.countDocuments({ news_id, vote_type: 'downvote' });
+                res.status(200).json({ message: `Vote updated to ${vote_type}`, votes: { upvote_count, downvote_count } });
+                return;
+            }
+        }
+        // Create new vote if no existing vote
+        const newVote = new Vote_1.default({ news_id, user_id, vote_type });
         yield newVote.save();
-        res.status(201).json(newVote);
+        // Increment the appropriate vote count
+        const incrementField = vote_type === 'upvote' ? 'upvote_count' : 'downvote_count';
+        yield News_1.default.findByIdAndUpdate(news_id, { $inc: { [incrementField]: 1 } });
+        // Retrieve updated vote counts
+        const upvote_count = yield Vote_1.default.countDocuments({ news_id, vote_type: 'upvote' });
+        const downvote_count = yield Vote_1.default.countDocuments({ news_id, vote_type: 'downvote' });
+        res.status(200).json({ message: `${vote_type} added`, votes: { upvote_count, downvote_count } });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error processing vote:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
-exports.createVote = createVote;
+exports.handleVote = handleVote;

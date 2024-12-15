@@ -14,17 +14,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNews = void 0;
 const zod_1 = require("zod");
-const News_1 = __importDefault(require("../models/News")); // Path to your News model
+const News_1 = __importDefault(require("../models/News"));
+const apicall_1 = require("../api/apicall");
 const createNewsSchema = zod_1.z.object({
     title: zod_1.z.string().min(1, "Title is required"),
     content: zod_1.z.string().min(1, "Content is required"),
-    image_url: zod_1.z.array(zod_1.z.string().url("Invalid image URL")).nonempty("At least one image URL is required"),
-    video_url: zod_1.z.array(zod_1.z.string().url("Invalid video URL")).nonempty("At least one video URL is required"),
-    publisher_id: zod_1.z.string({ invalid_type_error: "Invalid publisher ID format" }),
+    genres: zod_1.z.array(zod_1.z.string()).optional().default([]),
+    imageUrls: zod_1.z.array(zod_1.z.string()).optional().default([]),
+    videoUrls: zod_1.z.array(zod_1.z.string()).optional().default([]),
+    author: zod_1.z.string(),
+    avatar_id: zod_1.z.string(),
+    created_at: zod_1.z.date(),
 });
 const createNews = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const validation = createNewsSchema.safeParse(req.body);
+    console.log("Request user:", req.user);
+    if (!req.user || !req.user.username) {
+        res.status(401).json({ error: "Authentication required" });
+        return;
+    }
+    const validation = createNewsSchema.safeParse(Object.assign(Object.assign({}, req.body), { author: req.user.username, avatar_id: req.user.avatar_id, created_at: new Date() }));
+    console.log("Validation result:", validation); // Debug log
     if (!validation.success) {
+        console.error("Validation errors:", validation.error.errors); // Log detailed validation errors
         res.status(400).json({
             errors: validation.error.errors.map((err) => ({
                 path: err.path,
@@ -33,14 +44,37 @@ const createNews = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         });
         return;
     }
-    const { title, content, image_url, video_url, publisher_id } = validation.data;
+    const { title, content, genres, imageUrls, videoUrls, author, avatar_id, created_at } = validation.data;
     try {
+        const existingNews = yield News_1.default.findOne({ title, content }).exec();
+        if (existingNews) {
+            res.status(409).json({
+                error: "A news article with the same title and content already exists.",
+            });
+            return;
+        }
+        const claimScoreData = yield (0, apicall_1.getClaimScore)(content);
+        let real_probability = 0;
+        if (claimScoreData &&
+            Array.isArray(claimScoreData.results) &&
+            claimScoreData.results.length > 0 &&
+            typeof claimScoreData.results[0].score === 'number') {
+            real_probability = claimScoreData.results[0].score;
+        }
+        else {
+            console.warn("Unexpected claim score API response format:", claimScoreData);
+        }
+        console.log("Claim score:", real_probability);
         const newNews = new News_1.default({
             title,
             content,
-            image_urls: image_url.map((url) => ({ url })),
-            video_urls: video_url.map((url) => ({ url })),
-            publisher_id,
+            avatar_id,
+            author,
+            genres,
+            imageUrls,
+            videoUrls,
+            real_probability,
+            created_at
         });
         yield newNews.save();
         res.status(201).json(newNews);
@@ -48,6 +82,5 @@ const createNews = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-    next();
 });
 exports.createNews = createNews;
