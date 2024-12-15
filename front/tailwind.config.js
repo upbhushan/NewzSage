@@ -1,4 +1,5 @@
-const path = require('path');
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
