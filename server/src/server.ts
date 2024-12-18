@@ -11,6 +11,7 @@ import vote from "./routes/voteRoute";
 import connectDB from './db';
 import allNews from "./routes/getallnews";
 import auth from "./routes/auth";
+import test from "./routes/test";
 // import userInfoRoute from "./routes/userInfoRoute";
 
 const app = express();
@@ -34,7 +35,7 @@ app.use("/api/v1/all", allNews);
 app.use("/api/v1/news", news);
 app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);
-app.use("/test")
+app.use("/test",test);
 
 // Start the server
 app.listen(3000, () => {
