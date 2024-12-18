@@ -13,9 +13,10 @@ import allNews from "./routes/getallnews";
 import auth from "./routes/auth";
 import test from "./routes/test";
 // import userInfoRoute from "./routes/userInfoRoute";
+import serverless from 'serverless-http';
 
 const app = express();
-connectDB();
+
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -25,6 +26,10 @@ app.use(cors({
   credentials: true, // If you're using cookies or sessions
 }));
 
+connectDB().catch((error) => {
+  console.error('Failed to connect to the database:', error);
+  // Optionally, handle the error further if needed
+});
 
 
 // ** Global HEAD Middleware **
@@ -49,3 +54,6 @@ app.use("/test",test);
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
+
+// Export the handler for Vercel
+export const handler = serverless(app);
