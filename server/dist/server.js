@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
@@ -17,8 +18,8 @@ const getallnews_1 = __importDefault(require("./routes/getallnews"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const test_1 = __importDefault(require("./routes/test"));
 // import userInfoRoute from "./routes/userInfoRoute";
+const serverless_http_1 = __importDefault(require("serverless-http"));
 const app = (0, express_1.default)();
-(0, db_1.default)();
 // Middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
@@ -27,6 +28,10 @@ app.use((0, cors_1.default)({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow additional headers if required
     credentials: true, // If you're using cookies or sessions
 }));
+(0, db_1.default)().catch((error) => {
+    console.error('Failed to connect to the database:', error);
+    // Optionally, handle the error further if needed
+});
 // ** Global HEAD Middleware **
 app.use((req, res, next) => {
     if (req.method === "HEAD") {
@@ -48,3 +53,5 @@ app.use("/test", test_1.default);
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
+// Export the handler for Vercel
+exports.handler = (0, serverless_http_1.default)(app);

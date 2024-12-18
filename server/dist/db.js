@@ -16,11 +16,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const conn = yield mongoose_1.default.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/<dbname>', {});
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        if (!process.env.MONGODB_URI) {
+            throw new Error('MONGODB_URI is not defined in the environment variables');
+        }
+        yield mongoose_1.default.connect(process.env.MONGODB_URI);
+        console.log(`MongoDB Connected: ${mongoose_1.default.connection.host}`);
     }
     catch (error) {
-        console.error(`Error: ${error.message}`);
+        console.error(`Error connecting to MongoDB: ${error.message}`);
         process.exit(1);
     }
 });
