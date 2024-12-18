@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import user from "./routes/userRoute";
 // import publisher from "./routes/publisherRoute";
@@ -20,14 +20,22 @@ connectDB();
 app.use(express.json());
 app.use(cors({
   origin: '*', // Frontend URL (adjust accordingly)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow other methods as needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE','HEAD'], // Allow other methods as needed
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow additional headers if required
   credentials: true, // If you're using cookies or sessions
 }));
 
 
-// Routes
-// app.use('/api/v1/userInfo', userInfoRoute);
+
+// ** Global HEAD Middleware **
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method === "HEAD") {
+    res.status(200).end(); // Respond to HEAD requests without a body
+  } else {
+    next(); // Continue to other middleware/routes for non-HEAD requests
+  }
+});
+
 app.use("/api/v1/user", user);
 app.use("/api/v1/details", auth);
 // app.use("/api/v1/publisher", publisher);
