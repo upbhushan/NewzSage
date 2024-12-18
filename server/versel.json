@@ -1,0 +1,20 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "api/**/*.ts", "use": "@vercel/node" }
+    ],
+    "routes": [
+      { "src": "/api/(.*)", "dest": "/api/$1" }
+    ],
+    "env": {
+        "MONGODB_URI": "mongodb+srv://anu:myPassword@project.puzpj.mongodb.net/?retryWrites=true&w=majority&appName=newzSage",
+        "CLAIMBUSTER_API_KEY": "02ac743e6570462e9bf5014e5293ca03"
+    },
+    "functions": {
+      "api/**/*.ts": {
+        "memory": 512,
+        "maxDuration": 10
+      }
+    }
+  }
+  

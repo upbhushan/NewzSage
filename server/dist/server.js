@@ -21,7 +21,7 @@ const app = (0, express_1.default)();
 // Middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:5173', // Frontend URL (adjust accordingly)
+    origin: '*', // Frontend URL (adjust accordingly)
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow other methods as needed
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow additional headers if required
     credentials: true, // If you're using cookies or sessions
