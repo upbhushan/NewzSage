@@ -13,7 +13,7 @@ import allNews from "./routes/getallnews";
 import auth from "./routes/auth";
 import test from "./routes/test";
 // import userInfoRoute from "./routes/userInfoRoute";
-import serverless from 'serverless-http';
+// import serverless from 'serverless-http';
 
 const app = express();
 
@@ -56,4 +56,4 @@ app.use("/test",test);
 // });
 
 // Export the handler for Vercel
-export const handler = serverless(app);
+// export const handler = serverless(app);
