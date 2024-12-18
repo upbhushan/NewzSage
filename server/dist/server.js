@@ -50,8 +50,8 @@ app.use("/api/v1/comment", commentRoute_1.default);
 app.use("/api/v1/vote", voteRoute_1.default);
 app.use("/test", test_1.default);
 // Start the server
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-});
+// app.listen(3000, () => {
+//   console.log("Server is running on port 3000");
+// });
 // Export the handler for Vercel
 exports.handler = (0, serverless_http_1.default)(app);
