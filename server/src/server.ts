@@ -34,7 +34,7 @@ app.use("/api/v1/all", allNews);
 app.use("/api/v1/news", news);
 app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);
-app.use("/")
+app.use("/test")
 
 // Start the server
 app.listen(3000, () => {
