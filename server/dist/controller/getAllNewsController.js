@@ -16,7 +16,7 @@ exports.getAllNews = void 0;
 const News_1 = __importDefault(require("../models/News")); // Adjust the path as necessary
 const getAllNews = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("all");
+        // console.log("all");
         const news = yield News_1.default.find({}).populate('author', '-password_hash'); // Assuming each news has an 'author' field referencing User
         res.status(200).json(news);
     }

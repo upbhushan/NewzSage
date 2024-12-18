@@ -15,6 +15,7 @@ const voteRoute_1 = __importDefault(require("./routes/voteRoute"));
 const db_1 = __importDefault(require("./db"));
 const getallnews_1 = __importDefault(require("./routes/getallnews"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const test_1 = __importDefault(require("./routes/test"));
 // import userInfoRoute from "./routes/userInfoRoute";
 const app = (0, express_1.default)();
 (0, db_1.default)();
@@ -35,6 +36,7 @@ app.use("/api/v1/all", getallnews_1.default);
 app.use("/api/v1/news", newsRoute_1.default);
 app.use("/api/v1/comment", commentRoute_1.default);
 app.use("/api/v1/vote", voteRoute_1.default);
+app.use("/test", test_1.default);
 // Start the server
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
