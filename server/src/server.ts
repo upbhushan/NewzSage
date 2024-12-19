@@ -50,12 +50,14 @@ app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);
 app.use("/test",test);
 
-// Start the server
+// Start the server if this file is run directly
 if (require.main === module) {
   const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
+  if (!app.locals.server) {
+    app.locals.server = app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  }
 }
 
 // Export the app for testing or other usage
