@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.server = exports.app = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
@@ -20,7 +19,6 @@ const test_1 = __importDefault(require("./routes/test"));
 // import userInfoRoute from "./routes/userInfoRoute";
 // import serverless from 'serverless-http';
 const app = (0, express_1.default)();
-exports.app = app;
 // Middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
@@ -55,4 +53,5 @@ const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-exports.server = server;
+// Export the server as the default export
+exports.default = server;

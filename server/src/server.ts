@@ -56,5 +56,5 @@ const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-// Export the app and server for external usage
-export { app, server };
+// Export the server as the default export
+export default server;
