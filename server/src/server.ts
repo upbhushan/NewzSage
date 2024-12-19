@@ -51,9 +51,10 @@ app.use("/api/v1/vote", vote);
 app.use("/test",test);
 
 // Start the server
-// app.listen(3000, () => {
-//   console.log("Server is running on port 3000");
-// });
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
-// Export the handler for Vercel
-// export const handler = serverless(app);
+// Export the app and server for external usage
+export { app, server };
