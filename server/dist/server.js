@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.server = exports.app = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const express_1 = __importDefault(require("express"));
@@ -19,6 +20,7 @@ const test_1 = __importDefault(require("./routes/test"));
 // import userInfoRoute from "./routes/userInfoRoute";
 // import serverless from 'serverless-http';
 const app = (0, express_1.default)();
+exports.app = app;
 // Middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
@@ -49,8 +51,8 @@ app.use("/api/v1/comment", commentRoute_1.default);
 app.use("/api/v1/vote", voteRoute_1.default);
 app.use("/test", test_1.default);
 // Start the server
-// app.listen(3000, () => {
-//   console.log("Server is running on port 3000");
-// });
-// Export the handler for Vercel
-// export const handler = serverless(app);
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+exports.server = server;
