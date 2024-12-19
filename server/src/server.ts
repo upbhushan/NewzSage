@@ -51,10 +51,12 @@ app.use("/api/v1/vote", vote);
 app.use("/test",test);
 
 // Start the server
-const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
 
-// Export the server as the default export
-export default server;
+// Export the app for testing or other usage
+export default app;
