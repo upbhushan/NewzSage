@@ -56,13 +56,11 @@ app.use("/api/v1/vote", vote);
 
 
 // Start the server if this file is run directly
-if (require.main === module) {
+if (process.env.NODE_ENV !== "production") {
   const port = process.env.PORT || 3000;
-  if (!app.locals.server) {
-    app.locals.server = app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  }
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 }
 
 // Export the app for testing or other usage
