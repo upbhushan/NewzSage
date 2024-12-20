@@ -12,6 +12,7 @@ import connectDB from './db';
 import allNews from "./routes/getallnews";
 import auth from "./routes/auth";
 import test from "./routes/test";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 // import userInfoRoute from "./routes/userInfoRoute";
 // import serverless from 'serverless-http';
 
@@ -41,6 +42,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+app.get("/api",(req,res)=>{
+  res.send("API is running...");
+})
+
 app.use("/api/v1/user", user);
 app.use("/api/v1/details", auth);
 // app.use("/api/v1/publisher", publisher);
@@ -48,7 +53,7 @@ app.use("/api/v1/all", allNews);
 app.use("/api/v1/news", news);
 app.use("/api/v1/comment", comment);
 app.use("/api/v1/vote", vote);
-app.use("/test",test);
+
 
 // Start the server if this file is run directly
 if (require.main === module) {
@@ -61,4 +66,6 @@ if (require.main === module) {
 }
 
 // Export the app for testing or other usage
-export default app;
+export default (req: VercelRequest, res: VercelResponse) => {
+  app(req, res);
+};

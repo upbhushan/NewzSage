@@ -15,7 +15,6 @@ const voteRoute_1 = __importDefault(require("./routes/voteRoute"));
 const db_1 = __importDefault(require("./db"));
 const getallnews_1 = __importDefault(require("./routes/getallnews"));
 const auth_1 = __importDefault(require("./routes/auth"));
-const test_1 = __importDefault(require("./routes/test"));
 // import userInfoRoute from "./routes/userInfoRoute";
 // import serverless from 'serverless-http';
 const app = (0, express_1.default)();
@@ -40,6 +39,9 @@ app.use((req, res, next) => {
         next(); // Continue to other middleware/routes for non-HEAD requests
     }
 });
+app.get("/api", (req, res) => {
+    res.send("API is running...");
+});
 app.use("/api/v1/user", userRoute_1.default);
 app.use("/api/v1/details", auth_1.default);
 // app.use("/api/v1/publisher", publisher);
@@ -47,7 +49,6 @@ app.use("/api/v1/all", getallnews_1.default);
 app.use("/api/v1/news", newsRoute_1.default);
 app.use("/api/v1/comment", commentRoute_1.default);
 app.use("/api/v1/vote", voteRoute_1.default);
-app.use("/test", test_1.default);
 // Start the server if this file is run directly
 if (require.main === module) {
     const port = process.env.PORT || 3000;
@@ -58,4 +59,6 @@ if (require.main === module) {
     }
 }
 // Export the app for testing or other usage
-exports.default = app;
+exports.default = (req, res) => {
+    app(req, res);
+};
