@@ -1,3 +1,5 @@
+console.log("Server file loaded.");
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -42,7 +44,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-app.get("/api",(req,res)=>{
+app.get("/api",(req: Request, res: Response)=>{
   res.send("API is running...");
 })
 
