@@ -34,7 +34,7 @@ export default function SignIn() {
     const { email, password } = formData;
   
     try {
-      const response = await fetch('http://localhost:3000/api/v1/user/signin', {
+      const response = await fetch(`${process.env.VITE_BACKEND_URL}/api/v1/user/signin`  , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

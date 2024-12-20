@@ -30,7 +30,7 @@ export default function Content() {
         console.log(authUser)
         // Fetch the news data and comments based on the ID from the URL
         axios
-            .get(`http://localhost:3000/api/v1/all/news/${id}`) // Replace with your actual API URL
+            .get(`${process.env.VITE_BACKEND_URL}/api/v1/all/news/${id}`  ) // Replace with your actual API URL
             .then((response) => {
                 setNewsData(response.data);
                 setVotes({
@@ -44,7 +44,7 @@ export default function Content() {
 
         // Fetch comments for the news
         axios
-            .get(`http://localhost:3000/api/v1/comment/comments/${id}`) // Adjust endpoint as needed
+            .get(`${process.env.VITE_BACKEND_URL}/api/v1/comment/comments/${id}` ) // Adjust endpoint as needed
             .then((response) => {
                 setComments(response.data); // Store comments as objects
             })
@@ -130,7 +130,7 @@ export default function Content() {
             };
     
             // Send the new comment to the backend with the Authorization header
-            const response = await axios.post("http://localhost:3000/api/v1/comment", commentData, config);
+            const response = await axios.post(`${process.env.VITE_BACKEND_URL}/api/v1/comment`  , commentData, config);
     
             // If the comment is successfully created, add it to the comments state
             setComments((prev) => [...prev, response.data]);

@@ -63,7 +63,7 @@ export default function SignUp() {
 
       // console.log('Submitting payload:', payload);
 
-      const response = await fetch('http://localhost:3000/api/v1/user/signup', {
+      const response = await fetch(`${process.env.VITE_BACKEND_URL}/api/v1/user/signup`  , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
