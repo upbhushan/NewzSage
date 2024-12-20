@@ -108,7 +108,7 @@ export function useNews() {
   const fetchNews = async (currentPage) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.VITE_BACKEND_URL}/api/v1/all/news`  , {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/all/news`  , {
         headers: {
           Authorization: `Bearer ${token}`,
         },

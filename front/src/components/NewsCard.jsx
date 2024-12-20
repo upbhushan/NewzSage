@@ -31,7 +31,7 @@ export default function NewsCard({ news }) {
 
     setIsVoting(true);
     try {
-      const response = await fetch(`${process.env.VITE_BACKEND_URL}/api/v1/vote/change`  , {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/vote/change`  , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

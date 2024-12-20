@@ -104,7 +104,7 @@ export default function LocalVoice() {
     }
   
     try {
-      const response = await fetch(`${process.env.VITE_BACKEND_URL}/api/v1/news/post` , {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/news/post` , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
