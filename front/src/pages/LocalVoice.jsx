@@ -33,9 +33,9 @@ export default function LocalVoice() {
   const uploadToCloudinary = (file, type) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'newzsage'); // Replace with your Cloudinary preset
+    formData.append('upload_preset',  process.env.VITE_CLOUDINARY_UPLOAD_PRESET); // Replace with your Cloudinary preset
 
-    return fetch('https://api.cloudinary.com/v1_1/dfo0mxuix/upload', {
+    return fetch(process.env.VITE_CLOUDINARY_API_URL, {
       method: 'POST',
       body: formData,
     })
@@ -104,7 +104,7 @@ export default function LocalVoice() {
     }
   
     try {
-      const response = await fetch('http://localhost:3000/api/v1/news/post', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/news/post` , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
