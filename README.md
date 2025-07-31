@@ -122,5 +122,5 @@ NO License.
 
 ## Contact
 For inquiries or collaboration, reach out:
-- **GitHub**:  [Anurag Khobragade](https://github.com/anurag2204-k) || 
-- **LinkedIn**:  [Anurag Khobragade](https://www.linkedin.com/in/anuragk22) ||
+- **GitHub**:  [Bhushan Uparikar](https://github.com/upbhushan) || 
+- **LinkedIn**:  [Bhushan Uparikar](www.linkedin.com/in/bhushan-uparikar217) ||
