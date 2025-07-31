@@ -64,7 +64,7 @@ prashantsaxe-newzsage/
 ### Installation
 1. **Clone the repository**
    ```sh
-   git clone https://github.com/anurag2204-k/newzSage.git
+   git clone https://github.com/upbhushan/NewzSage.git
    cd newzsage
    ```
 
